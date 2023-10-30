@@ -88,3 +88,24 @@ Facilitates asynchronous communication between various services.
 Represents 3rd party services that the system interacts with for payment processing and mapping functionalities.
 
 Please refer to individual service documentation for more details on their specific responsibilities and functionalities.
+
+
+## Getting Started
+
+### Prerequisites
+
+Before you begin, make sure you have the following prerequisites installed:
+
+- Docker Engine 19.03.0+
+
+### Starting the Project
+
+1. Copy the `.env.example` file to `.env` and edit the values to configure your project.
+
+2. To start the project, open your terminal and enter the following command:
+
+   ```sh
+   make dev
+   ```
+
+This command will initiate the development environment.
