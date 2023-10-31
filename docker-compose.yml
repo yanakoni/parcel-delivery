@@ -32,7 +32,6 @@ services:
     ports:
       - "8080:8080"
     command: ['start-dev', "--import-realm"]
-    # command: ['start-dev']
     volumes:
       - ./keycloak:/opt/keycloak/data/import
     depends_on:
