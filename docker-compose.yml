@@ -25,11 +25,16 @@ services:
       DB_SCHEMA: public
       DB_PASSWORD: ${KC_PG_PASSWORD}
 
+      KC_FEATURES: web-authn,authorization,admin-api,account-api,admin-fine-grained-authz,docker,token-exchange,recovery-codes
       KEYCLOAK_ADMIN: ${KC_USER}
       KEYCLOAK_ADMIN_PASSWORD: ${KC_PASSWORD}
+
     ports:
       - "8080:8080"
-    command: ['start-dev']
+    command: ['start-dev', "--import-realm"]
+    # command: ['start-dev']
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import
     depends_on:
       keycloak-postgres:
         condition: service_healthy
