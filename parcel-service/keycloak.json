@@ -1,0 +1,6 @@
+{
+    "authServerUrl": "http://localhost:8080",
+    "realm": "master",
+    "clientId": "package-service",
+    "secret": "36a24d41-9e8f-4072-b90a-10e20a4b783b"
+}

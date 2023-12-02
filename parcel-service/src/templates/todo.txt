@@ -1,0 +1,9 @@
+add HBS email templates to send after parcel status update
+
+1 - parcel created
+2 - parcel updated
+3 - parcel pending
+4 - parcel pickedUp
+5 - parcel delivering
+6 - parcel cancelled
+7 - parcel delivered
