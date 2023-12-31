@@ -1,11 +1,11 @@
 import {
+    Body,
     Controller,
+    Delete,
     Get,
+    Param,
     Post,
     Put,
-    Delete,
-    Param,
-    Body,
     ValidationPipe,
 } from '@nestjs/common';
 import { VehicleService } from '../service/vehicle.service';

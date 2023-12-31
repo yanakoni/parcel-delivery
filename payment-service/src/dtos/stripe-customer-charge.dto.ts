@@ -1,19 +1,19 @@
+import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
 
-export class CreateVehicleDto {
-    @IsString()
+export class StripeCustomerChargeDto {
+    @IsNumber()
     @IsNotEmpty()
     @ApiProperty()
-    name: string;
-
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    type: string;
+    amount: number;
 
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    manufacturer: string;
+    currency: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
+    description: string;
 }
