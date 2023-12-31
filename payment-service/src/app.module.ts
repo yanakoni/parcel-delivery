@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Package, PackageRepository, PackageSchema } from './repository';
-import { PackageController } from './controller';
-import { PackageService } from './service';
+import { Payment, PaymentRepository, PaymentSchema } from './repository';
+import { PaymentController } from './controller';
+import { PaymentService } from './service';
 import {
     KeycloakConnectModule,
     PolicyEnforcementMode,
@@ -15,15 +15,15 @@ KeycloakConnectModule.register(`../keycloak.json`, {
 });
 
 @Module({
-    controllers: [PackageController],
-    providers: [PackageService, PackageRepository],
+    controllers: [PaymentController],
+    providers: [PaymentService, PaymentRepository],
     //  FIXME: retrieve connection string from app config
     imports: [
         MongooseModule.forRoot('mongodb://root:example@logistic-db:27017'),
         MongooseModule.forFeature([
             {
-                name: Package.name,
-                schema: PackageSchema,
+                name: Payment.name,
+                schema: PaymentSchema,
             },
         ]),
     ],

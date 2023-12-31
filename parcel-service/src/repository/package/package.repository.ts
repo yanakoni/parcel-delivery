@@ -45,7 +45,7 @@ export class PackageRepository implements RepositoryInterface<Package> {
         const items = await this.packageModel.aggregate(pipeline);
 
         if (!items) {
-            throw new BadRequestException("Зackages' read operation failed.");
+            throw new BadRequestException("Packages' read operation failed.");
         }
 
         return {

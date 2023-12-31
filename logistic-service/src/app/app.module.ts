@@ -8,7 +8,7 @@ import { Vehicle, VehicleSchema } from './vehicle/repository/vehicle.model';
 @Module({
     controllers: [VehicleController],
     providers: [VehicleService, VehicleRepository],
-    //  FIXME: rertieve connection string from app config
+    //  FIXME: retrieve connection string from app config
     imports: [
         MongooseModule.forRoot('mongodb://root:example@logistic-db:27017'),
         MongooseModule.forFeature([

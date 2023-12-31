@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { Address } from './address.model';
 
-// Represents an address of a user
+// Represents a post office
 @Schema({ timestamps: true })
 class PostOffice {
     @Prop({ required: true })
