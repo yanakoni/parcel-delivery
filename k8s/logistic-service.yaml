@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logistic-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logistic-service
+  template:
+    metadata:
+      labels:
+        app: logistic-service
+    spec:
+      containers:
+        - name: logistic-service
+          image: logistic-service
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: root
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: example
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logistic-service
+spec:
+  selector:
+    app: logistic-service
+  ports:
+    - name: tcp
+      port: 3000
+      targetPort: 3000
