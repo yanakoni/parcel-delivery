@@ -5,8 +5,8 @@ import { AppModule } from './app.module';
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     const config = new DocumentBuilder()
-        .setTitle('Parcel Service')
-        .setDescription('The Parcel Service API')
+        .setTitle('Payment Service')
+        .setDescription('The Payment Service API')
         .setVersion('1.0')
         .build();
     const document = SwaggerModule.createDocument(app, config);
