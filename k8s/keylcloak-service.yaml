@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keycloak-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keycloak-service
+  template:
+    metadata:
+      labels:
+        app: keycloak-service
+    spec:
+      containers:
+        - name: keycloak-service
+          image: keycloak-service
+          env:
+            - name: DB_VENDOR
+              value: POSTGRES
+            - name: DB_ADDR
+              value: keycloak-db
+            - name: DB_DATABASE
+              value: parcel-iam-db
+            - name: DB_USER
+              value: postgres
+            - name: DB_SCHEMA
+              value: public
+            - name: DB_PASSWORD
+              value: postgres
+            - name: KC_FEATURES
+              value: "web-authn,authorization,admin-api,account-api,admin-fine-grained-authz,docker,token-exchange,recovery-codes"
+            - name: KEYCLOAK_ADMIN
+              value: admin
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              value: password
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+              # this service takes a long time to startup, so the readiness status fails without initialDelaySeconds
+              # Provided initialDelaySeconds fix this problem, but as a result you need to wait 240 seconds which is too long
+              # Soluction: come up with a better logic for checking the readiness instead of constant 240 second
+            initialDelaySeconds: 240
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 400m
+              memory: 512Mi
+          ports:
+            - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak-service
+spec:
+  type: ClusterIP
+  selector:
+    app: keycloak-service
+  ports:
+    - name: tcp
+      port: 8080
+      targetPort: 8080

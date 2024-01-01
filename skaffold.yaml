@@ -1,0 +1,24 @@
+apiVersion: skaffold/v3
+kind: Config
+metadata:
+  name: app
+build:
+  artifacts:
+  - image: logistic-service
+    context: logistic-service
+  - image: keycloak-service
+    context: keycloak
+  tagPolicy:
+    gitCommit: {}
+  local:
+    useBuildkit: false
+manifests:
+  rawYaml:
+  # - ./k8s/*
+    - ./k8s/keycloak-db.yaml
+    - ./k8s/keylcloak-service.yaml
+    - ./k8s/logistic-db.yaml
+    - ./k8s/logistic-service.yaml
+  # TODO: add parcel and payment services
+deploy:
+  kubectl: {}
