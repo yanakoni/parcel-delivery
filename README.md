@@ -6,6 +6,7 @@ This repository contains the architecture diagram for the Parcel Delivery System
 
 The architecture of the Parcel Delivery System is divided into the following key components and services:
 
+<!-- TODO: update diagram: forward requests from frontend directly to services instead of passing them through keycloak-->
 ```mermaid
 flowchart LR
     subgraph Client
@@ -97,15 +98,37 @@ Please refer to individual service documentation for more details on their speci
 Before you begin, make sure you have the following prerequisites installed:
 
 - Docker Engine 19.03.0+
+- [Minikube](https://minikube.sigs.k8s.io/docs/start/)
+- [Skaffold](https://skaffold.dev/docs/install/)
 
-### Starting the Project
+### Starting the Project in the Local Cluster
 
-1. Copy the `.env.example` file to `.env` and edit the values to configure your project.
+1. Launch a local Kubernetes cluster with one of the following tools:
 
-2. To start the project, open your terminal and enter the following command:
+    - To launch **Minikube**. Please, ensure that the
+       local Kubernetes cluster has at least:
+        - 4 CPUs
+        - 4.0 GiB memory
+        - 32 GB disk space
 
-   ```sh
-   make dev
-   ```
+      ```shell
+      minikube start --cpus=4 --memory 4096 --disk-size 32g
+      ```
 
-This command will initiate the development environment.
+    - To launch **Docker for Desktop**. Go to Preferences:
+        - choose “Enable Kubernetes”,
+        - set CPUs to at least 3, and Memory to at least 6.0 GiB
+        - on the "Disk" tab, set at least 32 GB disk space
+
+
+2. Run `kubectl get nodes` to verify you're connected to the respective control plane.
+
+3. Run `skaffold run` (first time will be slow).
+   This will build and deploy the application. If you need to rebuild the images
+   automatically as you refactor the code, run `skaffold dev` command.
+
+4. Run `kubectl get pods` to verify the Pods are ready and running.
+
+5. Run `kubectl port-forward service/your-service-name 8080(port-on-yout-machine):8080(port-on-k8s-cluster)` to forward a port to the chosen service.
+
+6. Navigate to `localhost:port-on-yout-machine` to access the chosen service.
