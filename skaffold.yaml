@@ -6,6 +6,10 @@ build:
   artifacts:
   - image: logistic-service
     context: logistic-service
+  - image: payment-service
+    context: payment-service
+  - image: parcel-service
+    context: parcel-service
   - image: keycloak-service
     context: keycloak
   tagPolicy:
@@ -14,11 +18,11 @@ build:
     useBuildkit: false
 manifests:
   rawYaml:
-  # - ./k8s/*
-    - ./k8s/keycloak-db.yaml
-    - ./k8s/keylcloak-service.yaml
-    - ./k8s/logistic-db.yaml
-    - ./k8s/logistic-service.yaml
+  - ./k8s/*
+    # - ./k8s/keycloak-db.yaml
+    # - ./k8s/keylcloak-service.yaml
+    # - ./k8s/logistic-db.yaml
+    # - ./k8s/logistic-service.yaml
   # TODO: add parcel and payment services
 deploy:
   kubectl: {}

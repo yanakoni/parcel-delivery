@@ -1,22 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: logistic-service
+  name: logistic-db
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: logistic-service
+      app: logistic-db
   template:
     metadata:
       labels:
-        app: logistic-service
+        app: logistic-db
     spec:
       containers:
-        - name: logistic-service
-          image: logistic-service
+        - name: logistic-db
+          image: mongo:7.0-rc
           ports:
-            - containerPort: 3000
+            - containerPort: 27017
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: root
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: example
           resources:
             requests:
               cpu: 100m
@@ -28,11 +33,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: logistic-service
+  name: logistic-db
 spec:
   selector:
-    app: logistic-service
+    app: logistic-db
   ports:
     - name: tcp
-      port: 3000
-      targetPort: 3000
+      port: 27017
+      targetPort: 27017
