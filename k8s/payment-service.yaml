@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: logistic-service
+  name: payment-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: logistic-service
+      app: payment-service
   template:
     metadata:
       labels:
-        app: logistic-service
+        app: payment-service
     spec:
       containers:
-        - name: logistic-service
-          image: logistic-service
+        - name: payment-service
+          image: payment-service
           ports:
             - containerPort: 3000
           resources:
@@ -28,10 +28,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: logistic-service
+  name: payment-service
 spec:
   selector:
-    app: logistic-service
+    app: payment-service
   ports:
     - name: tcp
       port: 3000
