@@ -1,0 +1,113 @@
+---
+image: softwavetechnologies/node:18.12.0-base-0.1
+
+variables:
+  GIT_STRATEGY: fetch
+  GIT_DEPTH: 30
+  TAG_LATEST: $DOCKER_REGISTRY_ENDPOINT/softawave/frontend_$CI_COMMIT_REF_NAME:latest
+  TAG_COMMIT: $DOCKER_REGISTRY_ENDPOINT/softawave/frontend_$CI_COMMIT_REF_NAME:$CI_COMMIT_SHORT_SHA
+
+stages:
+  - prepare
+  - build
+  - publish
+  - deploy
+
+.pull-node-cache:
+  cache:
+    key:
+      files:
+        - package-lock.json
+      prefix: node
+    untracked: true
+    policy: pull
+
+prepare:
+  stage: prepare
+  only:
+    - develop
+    - main
+  script:
+    - npm install
+  artifacts:
+    name: node
+    paths:
+      - ./node_modules
+    expire_in: 2 hours
+    when: on_success
+  cache:
+    key:
+      files:
+        - package-lock.json
+      prefix: node
+    untracked: true
+    policy: pull-push
+
+build:
+  stage: build
+  only:
+    - develop
+    - main
+  extends:
+    - .pull-node-cache
+  before_script:
+    - export NODE_OPTIONS="--max-old-space-size=1024"
+  script:
+    - npm run build
+  artifacts:
+    name: node
+    paths:
+      - ./dist
+    expire_in: 2 hours
+    when: on_success
+  cache:
+    key: $CI_COMMIT_SHORT_SHA
+    untracked: true
+    policy: push
+
+publish:
+  stage: publish
+  image: docker:20-dind
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+  tags:
+    - private
+  environment:
+    name: ci-$CI_COMMIT_REF_NAME
+  only:
+    - develop
+    - main
+  extends:
+    - .pull-node-cache
+  services:
+    - docker:dind
+  script:
+    - docker build -f etc/docker/app/Dockerfile.$CI_COMMIT_REF_NAME -t $TAG_COMMIT -t $TAG_LATEST .
+    - docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD $DOCKER_REGISTRY_ENDPOINT
+    - docker push $TAG_COMMIT
+    - docker push $TAG_LATEST
+
+deploy:
+  stage: deploy
+  tags:
+    - private
+  environment:
+    name: ci-$CI_COMMIT_REF_NAME
+  only:
+    - develop
+    - main
+  image: alpine:latest
+  cache:
+    key: $CI_COMMIT_SHORT_SHA
+    untracked: true
+    policy: pull
+  script:
+    - chmod og= $ID_RSA
+    - apk update && apk add openssh-client
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD $DOCKER_REGISTRY_ENDPOINT"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker pull $TAG_COMMIT"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker container rm -f $CONTAINER_NAME || true"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker run -d -p 80:8080 -p 443:443 -v $CERT_VOLUME --name $CONTAINER_NAME --env APPLICATION_ENV=staging --env RELEASE=$CI_JOB_ID $TAG_COMMIT"
+    - ssh -i $ID_RSA -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP "docker image prune -af"
