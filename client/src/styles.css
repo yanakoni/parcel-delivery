@@ -1,0 +1,27 @@
+* {
+  font-family: Roboto, sans-serif;
+}
+
+main {
+  width: 100%;
+  min-height: 100vh;
+}
+
+.MuiChartsTooltip-root {
+  color: red;
+}
+
+[class^='MuiChartsTooltip-mark'] div {
+  background-color: #205eee;
+}
+
+.kyc .react-simple-image-viewer__modal {
+  & img {
+    max-width: 100%;
+    min-height: 70vh;
+  }
+
+  & span {
+    opacity: 0.8;
+  }
+}
