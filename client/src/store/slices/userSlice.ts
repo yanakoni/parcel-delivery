@@ -8,7 +8,29 @@ export interface UserState {
 }
 
 const initialState: UserState = {
-  user: null,
+  user: {
+    _id: '_id',
+    username: 'test user',
+    email: 'test@email.com',
+    profileInformation: {},
+    deliveryAddresses: [],
+    favouriteAddresses: [],
+    paymentInformation: {
+      sources: {},
+      ip: '8.8.8.8',
+      metadata: {},
+      currency: '',
+      preferredLocales: [],
+      card: {
+        brand: 'Visa',
+        expDate: '04/30',
+        last4: '4444',
+      },
+    },
+    preferences: {},
+    stripeId: 'stripeId',
+    userRole: 'ADMIN',
+  },
 };
 
 export const userSlice = createSlice({
@@ -21,19 +43,13 @@ export const userSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addMatcher(
-      authorizationApi.endpoints.getUserData.matchFulfilled,
-      (state, { payload }) => {
-        state.user = payload;
-      },
-    );
+    builder.addMatcher(authorizationApi.endpoints.getUserData.matchFulfilled, (state, { payload }) => {
+      state.user = payload;
+    });
 
-    builder.addMatcher(
-      authorizationApi.endpoints.logout.matchFulfilled,
-      (state) => {
-        state.user = null;
-      },
-    );
+    builder.addMatcher(authorizationApi.endpoints.logout.matchFulfilled, (state) => {
+      state.user = null;
+    });
   },
 });
 
@@ -41,11 +57,8 @@ export const { logout, setUser } = userSlice.actions;
 
 const selectUserSlice = (state: RootState) => state.user;
 
-export const selectUser = createSelector(
-  [selectUserSlice],
-  (userState: UserState) => {
-    return userState.user;
-  },
-);
+export const selectUser = createSelector([selectUserSlice], (userState: UserState) => {
+  return userState.user;
+});
 
 export const userReducer = userSlice.reducer;

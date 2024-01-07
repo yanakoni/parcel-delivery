@@ -1,42 +1,38 @@
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  UpdateProfileSettingsInput,
-  UpdateProfileSettingsSchema,
-} from './schema';
+import { UpdateProfileSettingsInput, UpdateProfileSettingsSchema } from './schema';
 import { useUpdateProfileMutation } from '../../../../api';
 import { SERIALIZER_NAMES } from '../../../../consts';
 import { showNotification } from '../../../../utils';
 import {
-  isValidationErrorObject,
-  isFetchBaseQueryErrorType,
-  isZodError,
-  isApiError,
   hasErrorMessage,
+  isApiError,
+  isFetchBaseQueryErrorType,
+  isValidationErrorObject,
+  isZodError,
 } from '../../../../guards';
 
 type UpdateProfileSettingsForm = {
-  settings_locale: string;
+  settingsLocale: string;
   settings_time_zone: string;
-  settings_table_items_count: string;
+  settingsTableItemsCount: string;
   settings_number_format: string;
   settings_date_format: string;
   settings_time_format: string;
 };
 
 const initialErrors = {
-  settings_locale: '',
+  settingsLocale: '',
   settings_time_zone: '',
-  settings_table_items_count: '',
+  settingsTableItemsCount: '',
   settings_number_format: '',
   settings_date_format: '',
   settings_time_format: '',
 };
 
 const useProfileSettingsForm = () => {
-  const [updateProfile, { isError, error, isLoading }] =
-    useUpdateProfileMutation();
+  const [updateProfile, { isError, error, isLoading }] = useUpdateProfileMutation();
   const [errors, setErrors] = useState(initialErrors);
   const methods = useForm<UpdateProfileSettingsInput>({
     resolver: zodResolver(UpdateProfileSettingsSchema),
@@ -68,16 +64,8 @@ const useProfileSettingsForm = () => {
         const formData = new FormData(event.currentTarget);
 
         const data = {
-          settings_locale: formData.get('settings_locale') as string,
-          settings_time_zone: formData.get('settings_time_zone') as string,
-          settings_table_items_count: formData.get(
-            'settings_table_items_count',
-          ) as string,
-          settings_number_format: formData.get(
-            'settings_number_format',
-          ) as string,
-          settings_date_format: formData.get('settings_date_format') as string,
-          settings_time_format: formData.get('settings_time_format') as string,
+          settingsLocale: formData.get('settingsLocale') as string,
+          settingsTableItemsCount: formData.get('settingsTableItemsCount') as string,
         };
 
         const validatedData = UpdateProfileSettingsSchema.parse(data);
@@ -85,12 +73,8 @@ const useProfileSettingsForm = () => {
         const requestData: any = {
           settings: {
             preferences: {
-              date_format: validatedData.settings_date_format,
-              locale: validatedData.settings_locale,
-              number_format: validatedData.settings_number_format,
-              table_items_count: +validatedData.settings_table_items_count,
-              time_format: validatedData.settings_time_format,
-              time_zone: validatedData.settings_time_zone,
+              locale: validatedData.settingsLocale,
+              table_items_count: +validatedData.settingsTableItemsCount,
             },
           },
         };

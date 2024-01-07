@@ -1,17 +1,10 @@
-import { CSSProperties, FC, useState } from 'react';
+import { FC, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  IconButton,
-  Toolbar as MuiToolbar,
-  Typography,
-  Box,
-  Badge,
-  Divider,
-} from '@mui/material';
-import { NotificationsNone, Menu, PersonOutline } from '@mui/icons-material';
+import { Badge, Box, Divider, IconButton, Toolbar as MuiToolbar, Typography } from '@mui/material';
+import { Menu, NotificationsNone, PersonOutline } from '@mui/icons-material';
 import { grey } from '@mui/material/colors';
 import { NotificationsList } from './NotificationsList';
-import { BASE_ASSETS_URL, ROUTES } from '../../consts';
+import { ROUTES } from '../../consts';
 import { UserWithRole } from '../../interfaces';
 import { styles } from './styles';
 
@@ -21,7 +14,6 @@ interface ToolbarProps {
 }
 
 const Toolbar: FC<ToolbarProps> = ({ user, handleDrawerToggle }) => {
-  const userAvatar = user.settings.profile.avatar;
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
   const openProfilePage = () => {
@@ -45,18 +37,9 @@ const Toolbar: FC<ToolbarProps> = ({ user, handleDrawerToggle }) => {
         >
           <Menu sx={{ color: grey[600] }} />
         </IconButton>
-        <Box
-          width="100%"
-          display="flex"
-          justifyContent="flex-end"
-          alignItems="center"
-        >
+        <Box width="100%" display="flex" justifyContent="flex-end" alignItems="center">
           <Box display="flex" alignItems="center">
-            <IconButton
-              aria-label="notifications"
-              onClick={toggleNotifications}
-              sx={styles.notificationsToggle}
-            >
+            <IconButton aria-label="notifications" onClick={toggleNotifications} sx={styles.notificationsToggle}>
               <Badge
                 badgeContent={2}
                 color="error"
@@ -68,41 +51,16 @@ const Toolbar: FC<ToolbarProps> = ({ user, handleDrawerToggle }) => {
                 <NotificationsNone width={24} height={24} />
               </Badge>
             </IconButton>
-            <Divider
-              flexItem
-              orientation="vertical"
-              sx={
-                userAvatar
-                  ? styles.toolbarDivider
-                  : styles.toolbarDividerPlaceholder
-              }
-            />
+            <Divider flexItem orientation="vertical" sx={styles.toolbarDividerPlaceholder} />
             <Box display="flex" alignItems="center">
               <Box mr={2}>
-                <IconButton
-                  size="large"
-                  aria-label="account of current user"
-                  onClick={openProfilePage}
-                >
-                  {userAvatar && (
-                    <img
-                      src={`${BASE_ASSETS_URL}${userAvatar}`}
-                      alt="User Avatar"
-                      style={styles.toolbarAvatar as CSSProperties}
-                    />
-                  )}
-                  {!userAvatar && (
-                    <PersonOutline sx={styles.toolbarAvatarPlaceholder} />
-                  )}
+                <IconButton size="large" aria-label="account of current user" onClick={openProfilePage}>
+                  <PersonOutline sx={styles.toolbarAvatarPlaceholder} />
                 </IconButton>
               </Box>
               <Box>
-                <Typography
-                  component="p"
-                  variant="subtitle1"
-                  color="text.primary"
-                >
-                  {`${user.firstName} ${user.lastName}`}
+                <Typography component="p" variant="subtitle1" color="text.primary">
+                  {user.username}
                 </Typography>
                 <Typography component="p" variant="h6" color="text.secondary">
                   {`${user?.userRole.roleType}`}
@@ -112,10 +70,7 @@ const Toolbar: FC<ToolbarProps> = ({ user, handleDrawerToggle }) => {
           </Box>
         </Box>
       </MuiToolbar>
-      <NotificationsList
-        toggle={toggleNotifications}
-        open={showNotifications}
-      />
+      <NotificationsList toggle={toggleNotifications} open={showNotifications} />
     </>
   );
 };
