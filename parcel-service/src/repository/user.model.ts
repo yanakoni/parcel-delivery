@@ -2,6 +2,30 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { Address } from './address.model';
 
+class PaymentInformation {
+    @Prop({ required: true })
+    currency: string;
+
+    @Prop({ required: true })
+    preferredLocales: string[];
+
+    @Prop({ required: true })
+    sources: any;
+
+    @Prop({ required: true })
+    ip: string;
+
+    @Prop({ required: true })
+    metadata: any;
+
+    @Prop({ required: true })
+    card: {
+        brand: string;
+        expDate: string;
+        last4: string;
+    };
+}
+
 // Represents a user
 @Schema({ timestamps: true })
 class User {
@@ -28,11 +52,15 @@ class User {
 
     // TODO
     @Prop({ required: true })
-    paymentInformation: any;
+    paymentInformation: PaymentInformation;
 
     // TODO
     @Prop({ required: true })
     preferences: any;
+
+    // TODO
+    @Prop({ required: false })
+    stripeId: string;
 }
 
 const UserSchema = SchemaFactory.createForClass(User);

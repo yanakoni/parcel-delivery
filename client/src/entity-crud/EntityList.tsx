@@ -43,7 +43,7 @@ const EntityListContent: FC<EntityListContentProps> = ({ entityConfig }) => {
       changeFiltersValue,
       setDynamicQueryObj,
     }),
-    [apiUrl, entityConfig, getEntityListReq, filtersState, changeFiltersValue, setDynamicQueryObj],
+    [apiUrl, entityConfig, filtersState, changeFiltersValue, setDynamicQueryObj],
   );
 
   const hasPermissions = useHasPermissions({

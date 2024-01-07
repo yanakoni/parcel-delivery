@@ -10,6 +10,7 @@ export const ROUTES = {
   LOGIN: '/login',
   RESET_PASSWORD: '/reset-password',
   CHANGE_PASSWORD: '/password',
+  USERS: '/users',
   ENTITY_LIST: `${ENTITY_LIST_ROUTE}:entityName`,
   ENTITY_EDIT: `${ENTITY_EDIT_ROUTE}:entityName/:entityId`,
   ENTITY_CREATE: `${ENTITY_CREATE_ROUTE}:entityName`,

@@ -1,9 +1,17 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { Authenticate, RedirectAuthorized, RequireAuth } from './components';
+import { Authenticate, RequireAuth } from './components';
 import { MainLayout } from './layouts';
 import { ROUTES } from './consts';
 import { EntityCreate, EntityEdit, EntityList, EntityRead } from './entity-crud';
-import { ChangePasswordPage, Dashboard, ErrorPage, LoginPage, ProfilePage, ResetPasswordPage } from './pages';
+import {
+  ChangePasswordPage,
+  Dashboard,
+  ErrorPage,
+  LoginPage,
+  ProfilePage,
+  ResetPasswordPage,
+  UsersList,
+} from './pages';
 
 export const router = createBrowserRouter([
   {
@@ -39,6 +47,14 @@ export const router = createBrowserRouter([
             ],
           },
           {
+            children: [
+              {
+                path: ROUTES.USERS,
+                element: <UsersList />,
+              },
+            ],
+          },
+          {
             path: ROUTES.ENTITY_LIST,
             element: <EntityList />,
           },
@@ -54,29 +70,41 @@ export const router = createBrowserRouter([
             path: ROUTES.ENTITY_READ,
             element: <EntityRead />,
           },
+          {
+            path: ROUTES.LOGIN,
+            element: <LoginPage />,
+          },
+          {
+            path: ROUTES.RESET_PASSWORD,
+            element: <ResetPasswordPage />,
+          },
+          {
+            path: ROUTES.CHANGE_PASSWORD,
+            element: <ChangePasswordPage />,
+          },
         ],
       },
     ],
   },
-  {
-    element: (
-      <Authenticate>
-        <RedirectAuthorized />
-      </Authenticate>
-    ),
-    children: [
-      {
-        path: ROUTES.LOGIN,
-        element: <LoginPage />,
-      },
-      {
-        path: ROUTES.RESET_PASSWORD,
-        element: <ResetPasswordPage />,
-      },
-      {
-        path: ROUTES.CHANGE_PASSWORD,
-        element: <ChangePasswordPage />,
-      },
-    ],
-  },
+  // {
+  //   element: (
+  //     <Authenticate>
+  //       <RedirectAuthorized />
+  //     </Authenticate>
+  //   ),
+  //   children: [
+  //     {
+  //       path: ROUTES.LOGIN,
+  //       element: <LoginPage />,
+  //     },
+  //     {
+  //       path: ROUTES.RESET_PASSWORD,
+  //       element: <ResetPasswordPage />,
+  //     },
+  //     {
+  //       path: ROUTES.CHANGE_PASSWORD,
+  //       element: <ChangePasswordPage />,
+  //     },
+  //   ],
+  // },
 ]);

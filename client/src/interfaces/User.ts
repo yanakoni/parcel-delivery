@@ -1,24 +1,39 @@
-import { Locale } from '../enums';
-import { Role } from './Role';
+interface Address {
+  country: string;
+  state: string;
+  city: string;
+  street: string;
+  tel: string;
+  note: string;
+}
 
-export interface User {
-  id: string;
-  status: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-  settings: {
-    preferences: {
-      locale: Locale;
-      tableItemsCount: number;
-    };
-    profile: {
-      avatar: string | null;
-      phone: string | null;
-    };
+interface PaymentInformation {
+  currency: string;
+  preferredLocales: string[];
+  sources: any;
+  ip: string;
+  metadata: any;
+  card: {
+    brand: string;
+    expDate: string;
+    last4: string;
   };
 }
 
-export interface UserWithRole extends User {
-  userRole: Role;
+interface User {
+  _id: string;
+  username: string;
+  email: string;
+  profileInformation: any;
+  deliveryAddresses: Address[];
+  favouriteAddresses: Address[];
+  paymentInformation: PaymentInformation;
+  preferences: any;
+  stripeId: string;
 }
+
+interface UserWithRole extends User {
+  userRole: any;
+}
+
+export type { User, UserWithRole, Address, PaymentInformation };
