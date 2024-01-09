@@ -40,7 +40,9 @@ spec:
               # this service takes a long time to startup, so the readiness status fails without initialDelaySeconds
               # Provided initialDelaySeconds fix this problem, but as a result you need to wait 240 seconds which is too long
               # Soluction: come up with a better logic for checking the readiness instead of constant 240 second
-            initialDelaySeconds: 240
+            initialDelaySeconds: 15
+            failureThreshold: 20
+            periodSeconds: 10
           resources:
             requests:
               cpu: 200m
