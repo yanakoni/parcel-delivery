@@ -1,4 +1,4 @@
-import { GridView, PersonOutline } from '@mui/icons-material';
+import { GridView, PersonOutline, DirectionsBikeTwoTone } from '@mui/icons-material';
 import { IMenuItem } from './components';
 import { ENTITIES, ROUTES } from '../consts';
 
@@ -14,5 +14,11 @@ export const menuConfig: IMenuItem[] = [
     label: 'Users',
     icon: PersonOutline,
     to: `${ENTITIES.USERS}`,
+  },
+  {
+    id: 'vehicles',
+    label: 'Vehicles',
+    icon: DirectionsBikeTwoTone,
+    to: `${ENTITIES.VEHICLES}`,
   },
 ];

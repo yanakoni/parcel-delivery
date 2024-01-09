@@ -12,6 +12,7 @@ import {
   ResetPasswordPage,
   UsersList,
 } from './pages';
+import { VehiclesList } from './pages/vehicles';
 
 export const router = createBrowserRouter([
   {
@@ -51,6 +52,14 @@ export const router = createBrowserRouter([
               {
                 path: ROUTES.USERS,
                 element: <UsersList />,
+              },
+            ],
+          },
+          {
+            children: [
+              {
+                path: ROUTES.VEHICLES,
+                element: <VehiclesList />,
               },
             ],
           },

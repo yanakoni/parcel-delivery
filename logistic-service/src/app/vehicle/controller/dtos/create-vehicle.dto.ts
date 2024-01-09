@@ -16,4 +16,8 @@ export class CreateVehicleDto {
     @IsNotEmpty()
     @ApiProperty()
     manufacturer: string;
+
+    @IsNotEmpty()
+    @ApiProperty()
+    capacity: number;
 }
