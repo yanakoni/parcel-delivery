@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DataGrid, DataGridProps, GridColDef, GridPaginationModel, GridValidRowModel } from '@mui/x-data-grid';
 import { CustomNoRowsOverlay } from '../CustomNoRowsOverlay';
 import { DeleteActionButton } from './DeleteActionButton';
-import { usePagination, useUserData } from '../../hooks';
+import { usePagination } from '../../hooks';
 import { EditActionButton } from './EditActionButton';
 // import { isCursorPagination } from '../../guards';
 import { EntityListResponse } from '../../api';
@@ -50,9 +50,7 @@ export function PaginatedTable<T extends GridValidRowModel>({
   defaultPageSize,
   ...props
 }: PaginatedTableProps<T>) {
-  const user = useUserData();
-
-  const pageSize = defaultPageSize || user.settings.preferences.tableItemsCount;
+  const pageSize = defaultPageSize || 20;
 
   const [rowCount, setRowCount] = useState(0);
   const [actualPaginationQuery, setActualPaginationQuery] = useState<Record<string, string>>({});

@@ -6,11 +6,11 @@ import { useUpdateProfileMutation } from '../../../../api';
 import { SERIALIZER_NAMES } from '../../../../consts';
 import { showNotification } from '../../../../utils';
 import {
-  isValidationErrorObject,
-  isFetchBaseQueryErrorType,
-  isZodError,
-  isApiError,
   hasErrorMessage,
+  isApiError,
+  isFetchBaseQueryErrorType,
+  isValidationErrorObject,
+  isZodError,
 } from '../../../../guards';
 
 type UpdateProfileForm = {
@@ -28,8 +28,7 @@ const initialErrors = {
 };
 
 const useProfileDataForm = () => {
-  const [updateProfile, { isError, error, isLoading }] =
-    useUpdateProfileMutation();
+  const [updateProfile, { isError, error, isLoading }] = useUpdateProfileMutation();
   const [errors, setErrors] = useState(initialErrors);
   const methods = useForm<UpdateProfileDataInput>({
     resolver: zodResolver(UpdateProfileDataSchema),
@@ -61,33 +60,14 @@ const useProfileDataForm = () => {
         const formData = new FormData(event.currentTarget);
 
         const data = {
-          first_name: formData.get('first_name') as string,
-          last_name: formData.get('last_name') as string,
-          settings_profile_phone: formData.get(
-            'settings_profile_phone',
-          ) as string,
-          settings_profile_avatar: methods.getValues().settings_profile_avatar,
+          username: formData.get('username') as string,
         };
 
         const validatedData = UpdateProfileDataSchema.parse(data);
 
         const requestData: any = {
-          first_name: validatedData.first_name,
-          last_name: validatedData.last_name,
-          settings: {
-            profile: {
-              avatar: validatedData.settings_profile_avatar,
-              phone: validatedData.settings_profile_phone,
-            },
-          },
+          username: validatedData.username,
         };
-
-        if (
-          requestData.settings.profile.avatar &&
-          !requestData.settings.profile.avatar.includes('base64')
-        ) {
-          delete requestData.settings.profile.avatar;
-        }
 
         const response = await updateProfile({
           ...requestData,

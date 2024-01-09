@@ -94,4 +94,16 @@ export const styles: { [key: string]: SxProps<Theme> } = {
     padding: '12px',
     fontWeight: 500,
   },
+  modalBox: {
+    position: 'absolute' as 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    padding: '30px',
+    width: '500px',
+    background: '#FFF',
+    borderRadius: '15px',
+    outline: 'none',
+    textAlign: 'center',
+  },
 };
