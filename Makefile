@@ -1,4 +1,4 @@
-.PHONY: help, dev, build
+.PHONY: help, dev, build, remove_containers, remove_docker_volumes
 
 help: ## Display available targets and their documentation
 	@echo "Available targets:"
@@ -9,3 +9,9 @@ dev: ## Run the application in the development environment
 
 build: ## Build the development environment
 	@docker compose build --parallel
+
+remove_containers:
+	@docker rm $$(docker ps -a -q --filter "name=parcel-delivery")
+
+remove_docker_volumes:
+	@docker volume rm $$(docker volume ls -qf "label=com.docker.compose.project=parcel-deliver")
