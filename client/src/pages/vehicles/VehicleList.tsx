@@ -1,36 +1,44 @@
 import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
 import { styles } from '../dashboard/styles';
 import { CustomNoRowsOverlay } from '../../components';
-import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { number, object, string, TypeOf } from 'zod';
+import { object, string, number, TypeOf } from 'zod';
 import { showNotification } from '../../utils';
 import { hasErrorMessage, isApiError, isZodError } from '../../guards';
 import { LoadingButton } from '@mui/lab';
 
 type VehicleForm = {
   id: number | null;
-  vehiclename: string;
-  email: string;
+  name: string;
+  type: string;
+  manufacturer: string;
+  capacity: number;
 };
 
 const initialErrors: Omit<VehicleForm, 'id'> = {
-  vehiclename: '',
-  email: '',
+  name: '',
+  type: '',
+  manufacturer: '',
+  capacity: 0,
 };
 
 const initialValues: VehicleForm = {
   id: null,
-  vehiclename: '',
-  email: '',
+  name: '',
+  type: '',
+  manufacturer: '',
+  capacity: 0,
 };
 
 const VehicleSchema = object({
   id: number().nullable(),
-  vehiclename: string().nonempty('Vehiclename is required'),
-  email: string().nonempty('Email is required'),
+  name: string().nonempty('Name is required'),
+  type: string().nonempty('Type is required'),
+  manufacturer: string().nonempty('Manufacturer is required'),
+  capacity: number().min(0, 'Capacity must be greater than or equal to 0'),
 });
 
 type VehicleSchemaInput = TypeOf<typeof VehicleSchema>;
@@ -44,15 +52,29 @@ const columns = (onDelete: (id: number) => Promise<void>, onEdit: (id: number) =
     headerAlign: 'left',
   },
   {
-    field: 'vehiclename',
-    headerName: 'Vehiclename',
+    field: 'name',
+    headerName: 'Name',
     flex: 1,
     align: 'center',
     headerAlign: 'center',
   },
   {
-    field: 'email',
-    headerName: 'Email',
+    field: 'type',
+    headerName: 'Type',
+    flex: 1,
+    align: 'center',
+    headerAlign: 'center',
+  },
+  {
+    field: 'manufacturer',
+    headerName: 'Manufacturer',
+    flex: 1,
+    align: 'center',
+    headerAlign: 'center',
+  },
+  {
+    field: 'capacity',
+    headerName: 'Capacity',
     flex: 1,
     align: 'center',
     headerAlign: 'center',
@@ -80,8 +102,8 @@ const columns = (onDelete: (id: number) => Promise<void>, onEdit: (id: number) =
 ];
 
 const VehiclesList = () => {
-  const vehicles = useRef<{
-    values: any[];
+  const [vehicles, setVehicles] = useState<{
+    values: VehicleForm[];
     meta: {
       page: number;
       pages: number;
@@ -89,16 +111,12 @@ const VehiclesList = () => {
       count: number;
     };
   }>({
-    values: Array.from(Array(100).keys()).map((i) => ({
-      id: i + 1,
-      vehiclename: `Vehicle ${i + 1}`,
-      email: `email${i + 1}@test.com`,
-    })),
+    values: [],
     meta: {
       page: 0,
-      pages: 5,
-      total: 100,
-      count: 20,
+      pages: 0,
+      total: 0,
+      count: 0,
     },
   });
   const [showEdit, setShowEdit] = useState(false);
@@ -109,37 +127,53 @@ const VehiclesList = () => {
     resolver: zodResolver(VehicleSchema),
   });
 
-  useEffect(() => {
-    // (async () => {
-    //   const response = await fetch('http://localhost:5000/api/vehicles');
-    //   setVehicles(await response.json());
-    // })();
-  }, []);
-
-  const onDelete = async (id: number) => {
-    vehicles.current = {
-      values: vehicles.current?.values.filter((vehicle) => vehicle.id !== id) || [],
-      meta: {
-        page: 0,
-        pages: 5,
-        total: 100,
-        count: 20,
-      },
-    };
-    // const response = await fetch('http://localhost:5000/api/vehicles', {
-    //   method: 'DELETE',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ id }),
-    // });
-    //   setVehicles(await response.json());
-    showNotification('Vehicle successfully deleted', 'success');
+  const fetchVehicles = async () => {
+    try {
+      const response = await fetch('http://127.0.0.1:8080/vehicles');
+      const data = await response.json();
+      setVehicles({
+        values: data.data,
+        meta: data.meta,
+      });
+    } catch (error) {
+      console.error('Error fetching vehicles:', error);
+      showNotification('Error fetching vehicles', 'error');
+    }
   };
 
-  const onEditToggle = async (id: number) => {
+  useEffect(() => {
+    fetchVehicles();
+  }, []); // Run only on mount
+
+  const onDelete = async (id: number) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8080/vehicles/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+
+
+ setVehicles((prevVehicles) => ({
+          values: prevVehicles.values.filter((vehicle) => vehicle.id !== id),
+          meta: prevVehicles.meta,
+        }));
+        showNotification('Vehicle successfully deleted', 'success');
+      } else {
+        showNotification('Failed to delete vehicle', 'error');
+      }
+    } catch (error) {
+      console.error('Error deleting vehicle:', error);
+      showNotification('Unexpected error', 'error');
+    }
+  };
+
+  const onEditToggle = (id: number) => {
     setShowEdit(!showEdit);
-    setEditedVehicle(vehicles.current?.values.find((vehicle) => vehicle.id === id));
+    setEditedVehicle(vehicles.values.find((vehicle) => vehicle.id === id) || initialValues);
   };
 
   const onCreateToggle = () => {
@@ -154,38 +188,33 @@ const VehiclesList = () => {
 
       const data = {
         id: editedVehicle.id as number,
-        vehiclename: formData.get('vehiclename') as string,
-        email: formData.get('email') as string,
+        name: formData.get('name') as string,
+        type: formData.get('type') as string,
+        manufacturer: formData.get('manufacturer') as string,
+        capacity: parseInt(formData.get('capacity') as string),
       };
 
       const validatedData = VehicleSchema.parse(data);
 
-      // const response = await fetch('http://localhost:5000/api/vehicles', {
-      //   method: 'PUT',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(validatedData),
-      // });
-      // setVehicles(await response.json());
-
-      // if (!Object.keys(response).length) {
-      //   return showNotification('Unexpected error', 'error');
-      // }
-
-      vehicles.current = {
-        values: vehicles.current?.values.map((vehicle) => (vehicle.id === editedVehicle.id ? validatedData : vehicle)) || [],
-        meta: {
-          page: 0,
-          pages: 5,
-          total: 100,
-          count: 20,
+      const response = await fetch(`http://127.0.0.1:8080/vehicles/${editedVehicle.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      };
-      setShowEdit(false);
-      setEditedVehicle(initialValues);
+        body: JSON.stringify(validatedData),
+      });
 
-      showNotification('Vehicle successfully updated', 'success');
+      if (response.ok) {
+        setVehicles((prevVehicles) => ({
+          values: prevVehicles.values.map((vehicle) => (vehicle.id === editedVehicle.id ? validatedData : vehicle)),
+          meta: prevVehicles.meta,
+        }));
+        setShowEdit(false);
+        setEditedVehicle(initialValues);
+        showNotification('Vehicle successfully updated', 'success');
+      } else {
+        showNotification('Failed to update vehicle', 'error');
+      }
     } catch (err) {
       if (isZodError(err)) {
         setErrors(
@@ -206,7 +235,7 @@ const VehiclesList = () => {
         showNotification('Unexpected error', 'error');
       }
     }
-  }, []);
+  }, [editedVehicle]);
 
   const onCreate = useCallback(async (event: FormEvent<HTMLFormElement>) => {
     try {
@@ -215,42 +244,33 @@ const VehiclesList = () => {
       const formData = new FormData(event.currentTarget);
 
       const data = {
-        id: vehicles.current?.values?.length + 1 || 0,
-        vehiclename: formData.get('vehiclename') as string,
-        email: formData.get('email') as string,
+        id: null,
+        name: formData.get('name') as string,
+        type: formData.get('type') as string,
+        manufacturer: formData.get('manufacturer') as string,
+        capacity: parseInt(formData.get('capacity') as string),
       };
-
-      console.log(data);
 
       const validatedData = VehicleSchema.parse(data);
 
-      console.log(validatedData);
-
-      // const response = await fetch('http://localhost:5000/api/vehicles', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(validatedData),
-      // });
-      // setVehicles(await response.json());
-
-      // if (!Object.keys(response).length) {
-      //   return showNotification('Unexpected error', 'error');
-      // }
-
-      vehicles.current = {
-        values: [...(vehicles.current?.values || []), validatedData],
-        meta: {
-          page: 0,
-          pages: 5,
-          total: 100,
-          count: 20,
+      const response = await fetch('http://127.0.0.1:8080/vehicles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-      };
-      setShowCreate(false);
+        body: JSON.stringify(validatedData),
+      });
 
-      showNotification('Vehicle successfully added', 'success');
+      if (response.ok) {
+        setVehicles((prevVehicles) => ({
+          values: [...prevVehicles.values, validatedData],
+          meta: prevVehicles.meta,
+        }));
+        setShowCreate(false);
+        showNotification('Vehicle successfully added', 'success');
+      } else {
+        showNotification('Failed to add vehicle', 'error');
+      }
     } catch (err) {
       if (isZodError(err)) {
         setErrors(
@@ -271,7 +291,7 @@ const VehiclesList = () => {
         showNotification('Unexpected error', 'error');
       }
     }
-  }, []);
+  }, [vehicles]);
 
   return (
     <>
@@ -281,8 +301,8 @@ const VehiclesList = () => {
       <Button onClick={onCreateToggle}>Create new</Button>
       {vehicles && (
         <DataGrid
-          loading={!vehicles.current.values.length}
-          rows={vehicles.current.values}
+          loading={!vehicles.values.length}
+          rows={vehicles.values}
           columns={columns(onDelete, onEditToggle)}
           pageSizeOptions={[5, 10, 20]}
           showCellVerticalBorder={false}
@@ -297,80 +317,132 @@ const VehiclesList = () => {
         />
       )}
       <Modal open={showEdit} onClose={() => setShowEdit(false)}>
+      <div>
         <FormProvider {...methods}>
           <Box component="form" onSubmit={onEdit} sx={styles.modalBox} mt={4} noValidate>
             <Typography variant="h6">Edit Vehicle</Typography>
             <Grid container spacing={4}>
               <Grid xs={12} md={6} item>
                 <TextField
-                  id="email"
-                  name="email"
-                  label="Email"
-                  type="email"
-                  autoComplete="email"
-                  defaultValue={editedVehicle?.email}
-                  helperText={errors.email}
-                  error={!!errors.email}
+                  id="name"
+                  name="name"
+                  label="Name"
+                  type="text"
+                  autoComplete="off"
+                  defaultValue={editedVehicle?.name}
+                  helperText={errors.name}
+                  error={!!errors.name}
                   fullWidth
                   autoFocus
                 />
               </Grid>
-            </Grid>
-            <Grid xs={12} md={6} item>
-              <TextField
-                id="vehiclename"
-                name="vehiclename"
-                label="Vehiclename"
-                type="text"
-                autoComplete="off"
-                defaultValue={editedVehicle?.vehiclename}
-                helperText={errors.vehiclename}
-                error={!!errors.vehiclename}
-                fullWidth
-              />
+              <Grid xs={12} md={6} item>
+                <TextField
+                  id="type"
+                  name="type"
+                  label="Type"
+                  type="text"
+                  autoComplete="off"
+                  defaultValue={editedVehicle?.type}
+                  helperText={errors.type}
+                  error={!!errors.type}
+                  fullWidth
+                />
+              </Grid>
+              <Grid xs={12} md={6} item>
+                <TextField
+                  id="manufacturer"
+                  name="manufacturer"
+                  label="Manufacturer"
+                  type="text"
+                  autoComplete="off"
+                  defaultValue={editedVehicle?.manufacturer}
+                  helperText={errors.manufacturer}
+                  error={!!errors.manufacturer}
+                  fullWidth
+                />
+              </Grid>
+              <Grid xs={12} md={6} item>
+                <TextField
+                  id="capacity"
+                  name="capacity"
+                  label="Capacity"
+                  type="number"
+                  defaultValue={editedVehicle?.capacity}
+                  helperText={errors.capacity}
+                  error={!!errors.capacity}
+                  fullWidth
+                />
+              </Grid>
             </Grid>
             <LoadingButton type="submit" variant="contained" sx={styles.formButton}>
               Update
             </LoadingButton>
           </Box>
         </FormProvider>
+        </div>
       </Modal>
       <Modal open={showCreate} onClose={() => setShowCreate(false)}>
+        <div>
         <FormProvider {...methods}>
           <Box component="form" onSubmit={onCreate} sx={styles.modalBox} mt={4} noValidate>
             <Typography variant="h6">Create Vehicle</Typography>
             <Grid container spacing={4}>
               <Grid xs={12} md={6} item>
                 <TextField
-                  id="email"
-                  name="email"
-                  label="Email"
-                  type="email"
-                  autoComplete="email"
-                  helperText={errors.email}
-                  error={!!errors.email}
+                  id="name"
+                  name="name"
+                  label="Name"
+                  type="text"
+                  autoComplete="off"
+                  helperText={errors.name}
+                  error={!!errors.name}
                   fullWidth
                   autoFocus
                 />
               </Grid>
-            </Grid>
-            <Grid xs={12} md={6} item>
-              <TextField
-                id="vehiclename"
-                name="vehiclename"
-                label="Vehiclename"
-                type="text"
-                autoComplete="off"
-                helperText={errors.vehiclename}
-                error={!!errors.vehiclename}
-                fullWidth
-              />
+              <Grid xs={12} md={6} item>
+                <TextField
+                  id="type"
+                  name="type"
+                  label="Type"
+                  type="text"
+                  autoComplete="off"
+                  helperText={errors.type}
+                  error={!!errors.type}
+                  fullWidth
+                />
+              </Grid>
+              <Grid xs={12} md={6} item>
+                <TextField
+                  id="manufacturer"
+                  name="manufacturer"
+                  label="Manufacturer"
+                  type="text"
+                  autoComplete="off"
+                  helperText={errors.manufacturer}
+                  error={!!errors.manufacturer}
+                  fullWidth
+                />
+              </Grid>
+              <Grid xs={12} md={6} item>
+                <TextField
+                  id="capacity"
+                  name="capacity"
+                  label="Capacity"
+                  type="number"
+                  helperText={errors.capacity}
+                  error={!!errors.capacity}
+                  fullWidth
+                />
+              </Grid>
             </Grid>
             <LoadingButton type="submit" variant="contained" sx={styles.formButton}>
               Create
             </LoadingButton>
           </Box>
         </FormProvider>
+        </div>
       </Modal>
     </>
   );

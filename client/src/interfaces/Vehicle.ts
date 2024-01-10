@@ -1,17 +1,9 @@
-
-
 interface Vehicle {
   _id: string;
-  username: string;
-  email: string;
-  profileInformation: any;
-  // deliveryAddresses: Address[];
-  // favouriteAddresses: Address[];
-  // paymentInformation: PaymentInformation;
-  preferences: any;
-  stripeId: string;
+  name: string;
+  type: string;
+  manufacturer: string;
+  capacity: number;
 }
-
-// interface U
 
 export type { Vehicle };

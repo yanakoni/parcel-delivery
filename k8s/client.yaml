@@ -1,20 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: logistic-service
+  name: client
+# restartPolicy: Always
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: logistic-service
+      app: client
   template:
     metadata:
       labels:
-        app: logistic-service
+        app: client
     spec:
       containers:
-        - name: logistic-service
-          image: logistic-service
+        - name: client
+          image: client
+          env:
+          - name: VITE_BASE_URL
+            value: http://localhost:8080
           ports:
             - containerPort: 8080
           resources:
@@ -28,11 +32,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: logistic-service
+  name: client
 spec:
-  # type: NodePort
   selector:
-    app: logistic-service
+    app: client
   ports:
     - name: tcp
       port: 8080
