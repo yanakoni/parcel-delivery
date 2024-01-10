@@ -11,6 +11,9 @@ export class Vehicle {
 
     @Prop({ required: true })
     manufacturer: string;
+
+    @Prop({ required: true })
+    capacity: number;
 }
 
 export type VehicleDocument = Vehicle & Document;

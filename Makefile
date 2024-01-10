@@ -1,4 +1,4 @@
-.PHONY: help, dev
+.PHONY: help, dev, build
 
 help: ## Display available targets and their documentation
 	@echo "Available targets:"
@@ -6,3 +6,6 @@ help: ## Display available targets and their documentation
 
 dev: ## Run the application in the development environment
 	@bash run-dev.sh
+
+build: ## Build the development environment
+	@docker compose build --parallel

@@ -1,42 +1,40 @@
 version: "3.8"
 name: "parcel-delivery"
 services:
-  keycloak-postgres:
-    image: "postgres:16.0"
-    volumes:
-    - kc_db_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_DB: ${KC_PG_DB}
-      POSTGRES_USER: ${KC_PG_USER}
-      POSTGRES_PASSWORD: ${KC_PG_PASSWORD}
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${KC_PG_USER} -d ${KC_PG_DB}"]
-      interval: 3s
-      timeout: 5s
-      retries: 3
+  # keycloak-db:
+  #   image: "postgres:16.0"
+  #   volumes:
+  #   - kc_db_data:/var/lib/postgresql/data
+  #   environment:
+  #     POSTGRES_DB: ${KC_PG_DB}
+  #     POSTGRES_USER: ${KC_PG_USER}
+  #     POSTGRES_PASSWORD: ${KC_PG_PASSWORD}
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U ${KC_PG_USER} -d ${KC_PG_DB}"]
+  #     interval: 3s
+  #     timeout: 5s
+  #     retries: 3
 
-  keycloak:
-    image: quay.io/keycloak/keycloak:22.0.5
-    environment:
-      DB_VENDOR: POSTGRES
-      DB_ADDR: keycloak-postgres
-      DB_DATABASE: ${KC_PG_DB}
-      DB_USER: ${KC_PG_USER}
-      DB_SCHEMA: public
-      DB_PASSWORD: ${KC_PG_PASSWORD}
-
-      KC_FEATURES: web-authn,authorization,admin-api,account-api,admin-fine-grained-authz,docker,token-exchange,recovery-codes
-      KEYCLOAK_ADMIN: ${KC_USER}
-      KEYCLOAK_ADMIN_PASSWORD: ${KC_PASSWORD}
-
-    ports:
-      - "8080:8080"
-    command: ['start-dev', "--import-realm"]
-    volumes:
-      - ./keycloak:/opt/keycloak/data/import
-    depends_on:
-      keycloak-postgres:
-        condition: service_healthy
+  # keycloak-service:
+  #   image: quay.io/keycloak/keycloak:22.0.5
+  #   environment:
+  #     DB_VENDOR: POSTGRES
+  #     DB_ADDR: keycloak-db
+  #     DB_DATABASE: ${KC_PG_DB}
+  #     DB_USER: ${KC_PG_USER}
+  #     DB_SCHEMA: public
+  #     DB_PASSWORD: ${KC_PG_PASSWORD}
+  #     KC_FEATURES: web-authn,authorization,admin-api,account-api,admin-fine-grained-authz,docker,token-exchange,recovery-codes
+  #     KEYCLOAK_ADMIN: ${KC_USER}
+  #     KEYCLOAK_ADMIN_PASSWORD: ${KC_PASSWORD}
+    # ports:
+    #   - "8080:8080"
+    # command: ['start-dev', "--import-realm"]
+    # volumes:
+    #   - ./keycloak:/opt/keycloak/data/import
+    # depends_on:
+    #   keycloak-db:
+    #     condition: service_healthy
 
   logistic-service:
     image: "logistic-service-image"
@@ -63,6 +61,16 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
 
+  ui:
+    image: "ui-image"
+    build:
+      context: client
+    container_name: ui
+    ports:
+      - "4173:4173"
+    environment:
+      MODE: development
+      VITE_BASE_URL: http://localhost:8080
 
 networks:
   logistic-network:
