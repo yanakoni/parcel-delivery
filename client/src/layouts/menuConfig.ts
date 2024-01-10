@@ -1,4 +1,4 @@
-import { GridView, PersonOutline, DirectionsBikeTwoTone } from '@mui/icons-material';
+import { GridView, PersonOutline, LocalShipping, Business } from '@mui/icons-material';
 import { IMenuItem } from './components';
 import { ENTITIES, ROUTES } from '../consts';
 
@@ -18,7 +18,14 @@ export const menuConfig: IMenuItem[] = [
   {
     id: 'vehicles',
     label: 'Vehicles',
-    icon: DirectionsBikeTwoTone,
+    icon: LocalShipping,
     to: `${ENTITIES.VEHICLES}`,
   },
+  {
+    id: 'postOffices',
+    label: 'Post Offices',
+    icon: Business,
+    to: `${ENTITIES.POST_OFFICES}`,
+  },
+  // for routes: ModeOfTravel
 ];

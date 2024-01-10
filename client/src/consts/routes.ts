@@ -12,6 +12,7 @@ export const ROUTES = {
   CHANGE_PASSWORD: '/password',
   USERS: '/users',
   VEHICLES: '/vehicles',
+  POST_OFFICES: '/post-offices',
   ENTITY_LIST: `${ENTITY_LIST_ROUTE}:entityName`,
   ENTITY_EDIT: `${ENTITY_EDIT_ROUTE}:entityName/:entityId`,
   ENTITY_CREATE: `${ENTITY_CREATE_ROUTE}:entityName`,

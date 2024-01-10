@@ -13,6 +13,7 @@ import {
   UsersList,
 } from './pages';
 import { VehiclesList } from './pages/vehicles';
+import { PostOfficeList } from './pages/postOffices';
 
 export const router = createBrowserRouter([
   {
@@ -60,6 +61,14 @@ export const router = createBrowserRouter([
               {
                 path: ROUTES.VEHICLES,
                 element: <VehiclesList />,
+              },
+            ],
+          },
+          {
+            children: [
+              {
+                path: ROUTES.POST_OFFICES,
+                element: <PostOfficeList />,
               },
             ],
           },
