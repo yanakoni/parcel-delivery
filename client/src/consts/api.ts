@@ -1,3 +1,5 @@
+import Keycloak, { KeycloakConfig } from 'keycloak-js';
+
 const API_PATH = '/api/v1';
 const VITE_BASE_URL = import.meta.env.VITE_BASE_URL;
 const BASE_URL = import.meta.env.MODE === 'development' ? `${VITE_BASE_URL}${API_PATH}` : API_PATH;
@@ -50,7 +52,15 @@ const ENTITIES = {
   PERMISSIONS: 'permissions',
 } as const;
 
+const initOptions: KeycloakConfig = {
+  url: import.meta.env.VITE_KEYCLOAK_BASE_URL,
+  realm: import.meta.env.VITE_KEYCLOAK_REALM,
+  clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID,
+};
+
+const keycloak = new Keycloak(initOptions);
+
 export type Endpoint = (typeof ENDPOINTS)[keyof typeof ENDPOINTS];
 export type EntityName = (typeof ENTITIES)[keyof typeof ENTITIES];
 
-export { ENTITIES, ENDPOINTS, BASE_URL, BASE_ASSETS_URL };
+export { keycloak, ENTITIES, ENDPOINTS, BASE_URL, BASE_ASSETS_URL };
