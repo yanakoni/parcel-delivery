@@ -1,14 +1,16 @@
 import { FC } from 'react';
 import { Outlet } from 'react-router-dom';
-// import { ROUTES } from '../consts';
-// import { useAppSelector } from '../hooks';
-// import { selectUser } from '../store';
+
+// import { keycloak } from '../consts';
 
 interface RequireAuthProps {}
 
 export const RequireAuth: FC<RequireAuthProps> = () => {
-  // const user = useAppSelector(selectUser);
+  // if (keycloak.authenticated && keycloak.userInfo) {
+  //   return <Outlet />;
+  // } else {
+  //   (async () => keycloak.login())();
+  // }
 
-  // return user ? <Outlet /> : <Navigate to={ROUTES.LOGIN} />;
   return <Outlet />;
 };

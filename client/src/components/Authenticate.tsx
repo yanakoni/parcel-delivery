@@ -1,11 +1,18 @@
 import { JSX } from 'react';
-import { useGetUserDataQuery } from '../api';
-import { Loader } from './Loader';
+// import { keycloak } from '../consts';
+// import { Loader } from './Loader';
 
 export const Authenticate = ({ children }: { children: JSX.Element }) => {
-  const getUserDataRequest = useGetUserDataQuery();
-
-  if (getUserDataRequest.isFetching) return <Loader type="fullscreen" />;
+  // const [userData, setUserData] = useState<any>(null);
+  //
+  // useEffect(() => {
+  //   (async () => {
+  //     const userData = await keycloak.loadUserInfo();
+  //     setUserData(userData);
+  //   })();
+  // }, []);
+  //
+  // if (!userData) return <Loader type="fullscreen" />;
 
   return children;
 };
