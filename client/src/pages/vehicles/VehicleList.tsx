@@ -129,7 +129,7 @@ const VehiclesList = () => {
 
   const fetchVehicles = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8080/vehicles');
+      const response = await fetch('http://localhost:3000/vehicles');
       const data = await response.json();
       setVehicles({
         values: data.data,
@@ -147,7 +147,7 @@ const VehiclesList = () => {
 
   const onDelete = async (id: number) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8080/vehicles/${id}`, {
+      const response = await fetch(`http://localhost:3000/vehicles/${id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -196,7 +196,7 @@ const VehiclesList = () => {
 
       const validatedData = VehicleSchema.parse(data);
 
-      const response = await fetch(`http://127.0.0.1:8080/vehicles/${editedVehicle.id}`, {
+      const response = await fetch(`http://localhost:3000/vehicles/${editedVehicle.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -253,7 +253,7 @@ const VehiclesList = () => {
 
       const validatedData = VehicleSchema.parse(data);
 
-      const response = await fetch('http://127.0.0.1:8080/vehicles', {
+      const response = await fetch('http://localhost:3000/vehicles', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
