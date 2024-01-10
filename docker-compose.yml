@@ -50,7 +50,6 @@ services:
 
   logistic-db:
     image: mongo:7.0-rc
-    container_name: logistic-mongo
     ports:
       - "27017:27017"
     networks:
@@ -79,3 +78,4 @@ volumes:
   kc_db_data:
     name: parcel-delivery-kc-db-data
   logistic-data:
+    name: parcel-delivery-logistic-db-data
