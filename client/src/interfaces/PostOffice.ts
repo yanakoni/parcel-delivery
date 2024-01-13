@@ -1,9 +1,12 @@
+import { Address } from './Address';
+
 interface PostOffice {
   _id: string;
   name: string;
-  type: string;
-  manufacturer: string;
-  capacity: number;
+  address: Address;
+  contactNumber: string;
+  workingHours: string;
+  servicesOffered: string;
 }
 
 export type { PostOffice };

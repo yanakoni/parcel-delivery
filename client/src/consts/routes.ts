@@ -13,6 +13,7 @@ export const ROUTES = {
   USERS: '/users',
   VEHICLES: '/vehicles',
   POST_OFFICES: '/post-offices',
+  CREATE_PACKAGE: '/new-package',
   ENTITY_LIST: `${ENTITY_LIST_ROUTE}:entityName`,
   ENTITY_EDIT: `${ENTITY_EDIT_ROUTE}:entityName/:entityId`,
   ENTITY_CREATE: `${ENTITY_CREATE_ROUTE}:entityName`,

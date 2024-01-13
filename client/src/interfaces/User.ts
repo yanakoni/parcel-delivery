@@ -1,24 +1,5 @@
-interface Address {
-  country: string;
-  state: string;
-  city: string;
-  street: string;
-  tel: string;
-  note: string;
-}
-
-interface PaymentInformation {
-  currency: string;
-  preferredLocales: string[];
-  sources: any;
-  ip: string;
-  metadata: any;
-  card: {
-    brand: string;
-    expDate: string;
-    last4: string;
-  };
-}
+import { Address } from './Address';
+import { PaymentInformation } from './PaymentInformation';
 
 interface User {
   _id: string;
@@ -36,4 +17,4 @@ interface UserWithRole extends User {
   userRole: any;
 }
 
-export type { User, UserWithRole, Address, PaymentInformation };
+export type { User, UserWithRole };

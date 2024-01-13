@@ -7,11 +7,19 @@ import { Vehicle, VehicleSchema } from './vehicle/repository/vehicle.model';
 import { PostOfficeController } from './postOffice/controller/postOffice.controller';
 import { PostOfficeService } from './postOffice/service/postOffice.service';
 import { PostOfficeRepository } from './postOffice/repository/postOffice.repository';
-import { PostOffice, PostOfficeSchema } from './postOffice/repository/postOffice.model';
+import {
+    PostOffice,
+    PostOfficeSchema,
+} from './postOffice/repository/postOffice.model';
 
 @Module({
     controllers: [VehicleController, PostOfficeController],
-    providers: [VehicleService, VehicleRepository, PostOfficeService, PostOfficeRepository],
+    providers: [
+        VehicleService,
+        VehicleRepository,
+        PostOfficeService,
+        PostOfficeRepository,
+    ],
     //  FIXME: retrieve connection string from app config
     imports: [
         MongooseModule.forRoot('mongodb://root:example@localhost:27017'),
@@ -21,9 +29,9 @@ import { PostOffice, PostOfficeSchema } from './postOffice/repository/postOffice
                 schema: VehicleSchema,
             },
             {
-              name: PostOffice.name,
-              schema: PostOfficeSchema,
-          },
+                name: PostOffice.name,
+                schema: PostOfficeSchema,
+            },
         ]),
     ],
 })

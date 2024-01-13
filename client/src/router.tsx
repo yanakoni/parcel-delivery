@@ -5,15 +5,16 @@ import { ROUTES } from './consts';
 import { EntityCreate, EntityEdit, EntityList, EntityRead } from './entity-crud';
 import {
   ChangePasswordPage,
+  CreatePackage,
   Dashboard,
   ErrorPage,
   LoginPage,
+  PostOfficeList,
   ProfilePage,
   ResetPasswordPage,
   UsersList,
+  VehiclesList,
 } from './pages';
-import { VehiclesList } from './pages/vehicles';
-import { PostOfficeList } from './pages/postOffices';
 
 export const router = createBrowserRouter([
   {
@@ -69,6 +70,14 @@ export const router = createBrowserRouter([
               {
                 path: ROUTES.POST_OFFICES,
                 element: <PostOfficeList />,
+              },
+            ],
+          },
+          {
+            children: [
+              {
+                path: ROUTES.CREATE_PACKAGE,
+                element: <CreatePackage />,
               },
             ],
           },

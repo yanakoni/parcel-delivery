@@ -23,7 +23,10 @@ export class VehicleService {
     }
 
     async update(id: string, updateDto: UpdateVehicleDto) {
-        const updatedVehicle = await this.vehicleRepository.update(id, updateDto);
+        const updatedVehicle = await this.vehicleRepository.update(
+            id,
+            updateDto,
+        );
         return this.mapToDto(updatedVehicle);
     }
 

@@ -21,20 +21,20 @@ import { Sort } from '../types';
 @Controller('package')
 @Resource(Package.name)
 export class PackageController {
-    constructor(private readonly packageService: PackageService) {}
+    constructor(private readonly parcelService: PackageService) {}
 
     @Get(':id')
     @Public()
     async findOne(@Param('id') id: string) {
-        const vehicle = await this.packageService.findById(id);
-        return { data: vehicle };
+        const parcel = await this.parcelService.findById(id);
+        return { data: parcel };
     }
 
     @Post()
     @Public()
     async create(@Body(new ValidationPipe()) createDto: CreatePackageDto) {
-        const vehicle = await this.packageService.create(createDto);
-        return { data: vehicle };
+        const parcel = await this.parcelService.create(createDto);
+        return { data: parcel };
     }
 
     @Put(':id')
@@ -44,7 +44,7 @@ export class PackageController {
         @Param('id') id: string,
         @Body(new ValidationPipe()) updateDto: UpdatePackageDto,
     ) {
-        const updatedPackage = await this.packageService.update(id, updateDto);
+        const updatedPackage = await this.parcelService.update(id, updateDto);
         return { data: updatedPackage };
     }
 
@@ -52,7 +52,7 @@ export class PackageController {
     @Roles({ roles: ['user', 'admin'] })
     @Scopes('Delete')
     async remove(@Param('id') id: string) {
-        const deletedPackage = await this.packageService.remove(id);
+        const deletedPackage = await this.parcelService.remove(id);
         return { data: deletedPackage };
     }
 
@@ -81,6 +81,6 @@ export class PackageController {
         }
 
         const pipeline = combinePipeline(skip, limit, sortParsed, filterParsed);
-        return this.packageService.findPaginated(pipeline);
+        return this.parcelService.findPaginated(pipeline);
     }
 }

@@ -3,6 +3,7 @@ import { CreatePackageDto, UpdatePackageDto } from '../dtos';
 import { Package, PackageRepository } from '../repository';
 import { PackageServiceInterface } from './package.service.interface';
 import { FilterQuery, PipelineStage } from 'mongoose';
+import { ParcelStatus } from '../enums';
 
 @Injectable()
 export class PackageService
@@ -20,6 +21,12 @@ export class PackageService
     }
 
     async create(createDto: CreatePackageDto): Promise<Package> {
+        createDto.createdAt = new Date();
+        createDto.updatedAt = new Date();
+        createDto.status = ParcelStatus.REGISTERED;
+        // TODO: use price estimation service
+        createDto.price = 0;
+
         return this.packageRepository.create(createDto);
     }
 

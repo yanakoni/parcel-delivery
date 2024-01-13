@@ -47,6 +47,7 @@ const ENTITIES = {
   DRIVERS: 'drivers',
   POST_OFFICES: 'post-offices',
   VEHICLES: 'vehicles',
+  CREATE_PACKAGE: 'new-package',
   CUSTOMERS: 'customers',
   TRANSACTIONS: 'transactions',
   PERMISSIONS: 'permissions',

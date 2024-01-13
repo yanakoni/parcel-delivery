@@ -41,7 +41,10 @@ export class PostOfficeController {
         @Param('id') id: string,
         @Body(new ValidationPipe()) updateDto: UpdatePostOfficeDto,
     ) {
-        const updatedVehicle = await this.postOfficeService.update(id, updateDto);
+        const updatedVehicle = await this.postOfficeService.update(
+            id,
+            updateDto,
+        );
         return { data: updatedVehicle };
     }
 
