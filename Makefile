@@ -14,4 +14,4 @@ remove_containers:
 	@docker rm $$(docker ps -a -q --filter "name=parcel-delivery")
 
 remove_docker_volumes:
-	@docker volume rm $$(docker volume ls -qf "label=com.docker.compose.project=parcel-deliver")
+	@docker volume rm $$(docker volume ls -qf "label=com.docker.compose.project=parcel-delivery")
