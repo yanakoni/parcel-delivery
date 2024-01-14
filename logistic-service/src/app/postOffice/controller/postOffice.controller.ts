@@ -6,12 +6,13 @@ import {
     Param,
     Post,
     Put,
+    Query,
     ValidationPipe,
 } from '@nestjs/common';
 import { PostOfficeService } from '../service/postOffice.service';
 import { CreatePostOfficeDto } from './dtos/create-postOffice.dto';
 import { UpdatePostOfficeDto } from './dtos/update-postOffice.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiQuery, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('PostOffices')
 @Controller('postOffices')
@@ -19,8 +20,9 @@ export class PostOfficeController {
     constructor(private readonly postOfficeService: PostOfficeService) {}
 
     @Get()
-    async findAll() {
-        const postOffices = await this.postOfficeService.findAll();
+    @ApiQuery({ name: 'namePrefix', required: false })
+    async findAll(@Query('namePrefix') namePrefix?: string) {
+        const postOffices = await this.postOfficeService.findAll(namePrefix);
         return { data: postOffices };
     }
 

@@ -1,4 +1,4 @@
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { RepositoryInterface } from './postOffice.repository.interface';
@@ -12,9 +12,13 @@ export class PostOfficeRepository implements RepositoryInterface<PostOffice> {
         private postOfficeModel: Model<PostOffice>,
     ) {}
 
-    async findAll(): Promise<PostOffice[]> {
-        return this.postOfficeModel.find().exec();
-    }
+    async findAll(namePrefix?: string): Promise<PostOffice[]> {
+      const query: FilterQuery<PostOffice> = namePrefix
+          ? { name: { $regex: new RegExp(`^${namePrefix}`, 'i') } }
+          : {};
+
+      return this.postOfficeModel.find(query).exec();
+  }
 
     async findById(id: string): Promise<PostOffice | null> {
         return this.postOfficeModel.findById(id).exec();

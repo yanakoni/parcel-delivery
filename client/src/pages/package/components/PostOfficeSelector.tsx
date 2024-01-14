@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
+import { ExpandMore as ExpandMoreIcon, TransgenderTwoTone } from '@mui/icons-material';
 import {
   Accordion,
   AccordionDetails,
@@ -14,6 +14,7 @@ import {
 import { apiRequest, showNotification } from '../../../utils';
 import { hasErrorMessage } from '../../../guards';
 import { PostOffice } from '../../../interfaces';
+import axios from 'axios';
 
 interface PostOfficeSelectorProps {
   selectedPostOfficeId: string;
@@ -43,10 +44,7 @@ const PostOfficeSelector = ({ selectedPostOfficeId, onPostOfficeSelect }: PostOf
   const searchPostOffices = async (value = '') => {
     try {
       const abortController = new AbortController();
-
-      const { data: responseData } = await apiRequest(`http://localhost:3001/postOffice/search?search=${value}`, {
-        signal: abortController.signal,
-      });
+      const { data: responseData } = await axios.get('http://localhost:3000/postOffices', { params: {'namePrefix': value}});
       const { message, data } = responseData;
 
       if (message) {
@@ -83,7 +81,7 @@ const PostOfficeSelector = ({ selectedPostOfficeId, onPostOfficeSelect }: PostOf
           <TextField
             type="search"
             name="search"
-            onChange={({ target: { value = '' } }) => searchPostOffices(value)}
+            onChange={(event) => searchPostOffices(event.target.value)}
             placeholder="Search a postOffice..."
             fullWidth
           />
