@@ -44,7 +44,7 @@ const PostOfficeSelector = ({ selectedPostOfficeId, onPostOfficeSelect }: PostOf
     try {
       const abortController = new AbortController();
 
-      const { data: responseData } = await apiRequest(`postOffice/search?search=${value}`, {
+      const { data: responseData } = await apiRequest(`http://localhost:3001/postOffice/search?search=${value}`, {
         signal: abortController.signal,
       });
       const { message, data } = responseData;

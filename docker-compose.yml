@@ -45,8 +45,7 @@ services:
     networks:
       - logistic-network
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      DB_CONN_STRING: mongodb://root:example@logistic-db:27017
 
   logistic-db:
     image: mongo:7.0-rc
@@ -56,6 +55,25 @@ services:
       - logistic-network
     volumes:
       - logistic-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  parcel-service:
+    image: "parcel-service-image"
+    build:
+      context: parcel-service
+    ports:
+      - "3001:3001"
+    environment:
+      DB_CONN_STRING: mongodb://root:example@parcel-db:27017
+
+  parcel-db:
+    image: mongo:7.0-rc
+    ports:
+      - "27018:27017"
+    volumes:
+      - parcel-data:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
@@ -79,3 +97,5 @@ volumes:
     name: parcel-delivery-kc-db-data
   logistic-data:
     name: parcel-delivery-logistic-db-data
+  parcel-data:
+    name: parcel-delivery-parcel-db-data

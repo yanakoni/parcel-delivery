@@ -4,6 +4,46 @@ import { Type } from 'class-transformer';
 import { Address, Dimension } from '../repository';
 import { ParcelStatus } from '../enums';
 
+class DimensionDto {
+  @IsNotEmpty()
+  @ApiProperty()
+  length: number;
+
+  @IsNotEmpty()
+  @ApiProperty()
+  width: number;
+
+  @IsNotEmpty()
+  @ApiProperty()
+  height: number;
+}
+
+class AddressDto {
+    @IsNotEmpty()
+    @ApiProperty()
+    country: string;
+
+    @IsNotEmpty()
+    @ApiProperty()
+    state: string;
+
+    @IsNotEmpty()
+    @ApiProperty()
+    city: string;
+
+    @IsNotEmpty()
+    @ApiProperty()
+    street: string;
+
+    @IsNotEmpty()
+    @ApiProperty()
+    tel: string;
+
+    @IsNotEmpty()
+    @ApiProperty()
+    note: string;
+}
+
 export class CreatePackageDto {
     // @Transform(({ obj: { _id } }) => _id.toString())
     @IsNotEmpty()
@@ -15,10 +55,10 @@ export class CreatePackageDto {
     @ApiProperty()
     receiver: string;
 
-    @Type(() => Dimension)
+    @Type(() => DimensionDto)
     @IsNotEmpty()
     @ApiProperty()
-    dimensions: Dimension;
+    dimensions: DimensionDto;
 
     @IsNumber()
     @IsNotEmpty()
@@ -33,16 +73,16 @@ export class CreatePackageDto {
     @ApiProperty()
     destinationPostOffice?: string;
 
-    @Type(() => Address)
+    @Type(() => AddressDto)
     @ApiProperty()
-    departureAddress?: Address;
+    departureAddress?: AddressDto;
 
-    @Type(() => Address)
+    @Type(() => AddressDto)
     @ApiProperty()
-    destinationAddress?: Address;
+    destinationAddress?: AddressDto;
 
     @IsEnum(ParcelStatus)
-    @ApiProperty()
+    @ApiProperty({enum: ParcelStatus, default: ParcelStatus.PENDING})
     status?: ParcelStatus;
 
     @IsNumber()

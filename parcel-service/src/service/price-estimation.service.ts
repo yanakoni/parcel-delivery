@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { Address, Dimension } from '../repository';
@@ -15,8 +15,6 @@ export class PriceEstimationService implements PriceEstimationServiceInterface {
     constructor(
         @Inject(ConfigService)
         private readonly config: ConfigService,
-        @Inject(Logger)
-        private readonly logger: Logger,
     ) {
         this.GOOGLE_API_KEY = this.config.get('googleApiKey');
         this.BASE_PRICE = this.config.get('package.basePrice');
@@ -82,7 +80,7 @@ export class PriceEstimationService implements PriceEstimationServiceInterface {
                 return 0;
             }
         } catch (error) {
-            this.logger.error('Error: ', error);
+            console.error('Error: ', error);
             return 0;
         }
     }

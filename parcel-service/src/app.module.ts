@@ -3,23 +3,24 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Package, PackageRepository, PackageSchema } from './repository';
 import { PackageController } from './controller';
 import { PackageService } from './service';
-import {
-    KeycloakConnectModule,
-    PolicyEnforcementMode,
-    TokenValidation,
-} from 'nest-keycloak-connect';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import configuration from './config/configuration';
 
-KeycloakConnectModule.register(`../keycloak.json`, {
-    policyEnforcement: PolicyEnforcementMode.PERMISSIVE,
-    tokenValidation: TokenValidation.ONLINE,
-});
 
 @Module({
     controllers: [PackageController],
     providers: [PackageService, PackageRepository],
-    //  FIXME: retrieve connection string from app config
     imports: [
-        MongooseModule.forRoot('mongodb://root:example@logistic-db:27017'),
+      ConfigModule.forRoot({
+        load: [configuration],
+        isGlobal: true
+      }),
+      MongooseModule.forRootAsync({
+        inject: [ConfigService],
+          useFactory: (configService: ConfigService) => ({
+              uri: configService.get('DB_CONN_STRING'),
+          }),
+      }),
         MongooseModule.forFeature([
             {
                 name: Package.name,
