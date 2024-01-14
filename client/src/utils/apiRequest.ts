@@ -2,14 +2,12 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { showNotification } from './showNotification';
 import { keycloak } from '../consts';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
+// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
 const SERVER_NOT_RESPONDING_MSG = 'The server took too long to respond.';
 const TIMEOUT = 6000;
 const EMAIL_TRIGGER_TIMEOUT = 20000;
 
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-});
+const apiClient = axios.create();
 
 apiClient.interceptors.response.use(
   (response) => {
@@ -44,7 +42,7 @@ apiClient.interceptors.response.use(
 
 // email triggering requests take more time because of the template compilation
 const apiRequest = async (
-  path: string,
+  url: string,
   requestInit?: AxiosRequestConfig,
   willTriggerEmail?: boolean,
 ): Promise<AxiosResponse> => {
@@ -53,7 +51,7 @@ const apiRequest = async (
   const _requestInit: AxiosRequestConfig = requestInit ?? {};
   const _headers = _requestInit.headers ?? {};
   const _method = _requestInit.method ?? 'GET';
-  const url = new URL(path, API_BASE_URL).toString();
+  // const url = new URL(url, API_BASE_URL).toString();
 
   if (token && refreshToken) {
     _headers['access-token'] = `Bearer ${token}`;
@@ -74,4 +72,4 @@ const apiRequest = async (
   });
 };
 
-export { apiRequest, API_BASE_URL };
+export { apiRequest };

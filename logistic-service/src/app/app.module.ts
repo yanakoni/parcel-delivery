@@ -11,6 +11,8 @@ import {
     PostOffice,
     PostOfficeSchema,
 } from './postOffice/repository/postOffice.model';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import configuration from './config/configuration';
 
 @Module({
     controllers: [VehicleController, PostOfficeController],
@@ -19,10 +21,19 @@ import {
         VehicleRepository,
         PostOfficeService,
         PostOfficeRepository,
+        ConfigService,
     ],
-    //  FIXME: retrieve connection string from app config
     imports: [
-        MongooseModule.forRoot('mongodb://root:example@localhost:27017'),
+      ConfigModule.forRoot({
+        load: [configuration],
+        isGlobal: true
+      }),
+      MongooseModule.forRootAsync({
+        inject: [ConfigService],
+          useFactory: (configService: ConfigService) => ({
+              uri: configService.get('DB_CONN_STRING'),
+          }),
+      }),
         MongooseModule.forFeature([
             {
                 name: Vehicle.name,

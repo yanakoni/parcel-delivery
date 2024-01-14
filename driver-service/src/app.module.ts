@@ -3,12 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Payment, PaymentRepository, PaymentSchema } from './repository';
 import { DriverController } from './controller';
 import { PaymentService } from './service';
-import { KeycloakConnectModule, PolicyEnforcementMode, TokenValidation } from 'nest-keycloak-connect';
 
-KeycloakConnectModule.register(`../keycloak.json`, {
-    policyEnforcement: PolicyEnforcementMode.PERMISSIVE,
-    tokenValidation: TokenValidation.ONLINE,
-});
 
 @Module({
     controllers: [DriverController],

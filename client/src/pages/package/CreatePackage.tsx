@@ -208,7 +208,7 @@ const CreatePackage = () => {
 
       const validatedData = PackageSchema.parse(data);
 
-      const response = await fetch('http://localhost:3000/package', {
+      const response = await fetch('http://localhost:3001/package', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
