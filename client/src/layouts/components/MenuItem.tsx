@@ -2,20 +2,8 @@ import { FC, useCallback, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ExpandLess, ExpandMore, SvgIconComponent } from '@mui/icons-material';
 import { SxProps } from '@mui/system';
-import {
-  Collapse,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Theme,
-} from '@mui/material';
-import { UserRole } from '../../consts';
-import {
-  HasPermissionsArgs,
-  useHasPermissions,
-  useUserRole,
-} from '../../hooks';
+import { Collapse, List, ListItemButton, ListItemIcon, ListItemText, Theme } from '@mui/material';
+import { keycloak, USER_ROLES, UserRole } from '../../consts';
 
 interface IMenuItem {
   id: number | string;
@@ -24,7 +12,7 @@ interface IMenuItem {
   to?: string;
   menuGroup?: string;
   nested?: IMenuItem[];
-  permission?: HasPermissionsArgs;
+  // permission?: HasPermissionsArgs;
   roles?: UserRole[];
   excludeRoles?: UserRole[];
   isExternalLink?: boolean;
@@ -36,7 +24,6 @@ const MenuItem: FC<IMenuItem & { level?: number }> = ({
   icon: Icon,
   nested,
   to,
-  permission,
   menuGroup,
   roles,
   excludeRoles,
@@ -47,12 +34,9 @@ const MenuItem: FC<IMenuItem & { level?: number }> = ({
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
-  const userRole = useUserRole();
-  const hasPermissions = useHasPermissions(permission);
+  const userRole = (keycloak.userInfo as any)?.role || USER_ROLES.CLIENT;
 
-  const anyNestedItemSelected = nested?.some(
-    (item) => item?.menuGroup && pathname.includes(item.menuGroup),
-  );
+  const anyNestedItemSelected = nested?.some((item) => item?.menuGroup && pathname.includes(item.menuGroup));
   const selected = useMemo(() => {
     if (menuGroup) {
       return pathname.includes(menuGroup);
@@ -95,7 +79,7 @@ const MenuItem: FC<IMenuItem & { level?: number }> = ({
     ...(level && { pl: 4 * level }),
   };
 
-  if (!hasPermissions || !availableForCurrentRole) return null;
+  if (!availableForCurrentRole) return null;
 
   return (
     <>

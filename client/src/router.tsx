@@ -8,7 +8,6 @@ import {
   CreatePackage,
   Dashboard,
   ErrorPage,
-  LoginPage,
   PostOfficeList,
   ProfilePage,
   ResetPasswordPage,
@@ -77,7 +76,7 @@ export const router = createBrowserRouter([
             children: [
               {
                 path: ROUTES.CREATE_PACKAGE,
-                element: <CreatePackage />,
+                element: <CreatePackage isAdmin />,
               },
             ],
           },
@@ -98,10 +97,6 @@ export const router = createBrowserRouter([
             element: <EntityRead />,
           },
           {
-            path: ROUTES.LOGIN,
-            element: <LoginPage />,
-          },
-          {
             path: ROUTES.RESET_PASSWORD,
             element: <ResetPasswordPage />,
           },
@@ -111,27 +106,22 @@ export const router = createBrowserRouter([
           },
         ],
       },
+      {
+        path: ROUTES.RESET_PASSWORD,
+        element: <ResetPasswordPage />,
+      },
+      {
+        path: ROUTES.CHANGE_PASSWORD,
+        element: <ChangePasswordPage />,
+      },
+      {
+        children: [
+          {
+            path: ROUTES.CREATE_PACKAGE,
+            element: <CreatePackage isAdmin={false} />,
+          },
+        ],
+      },
     ],
   },
-  // {
-  //   element: (
-  //     <Authenticate>
-  //       <RedirectAuthorized />
-  //     </Authenticate>
-  //   ),
-  //   children: [
-  //     {
-  //       path: ROUTES.LOGIN,
-  //       element: <LoginPage />,
-  //     },
-  //     {
-  //       path: ROUTES.RESET_PASSWORD,
-  //       element: <ResetPasswordPage />,
-  //     },
-  //     {
-  //       path: ROUTES.CHANGE_PASSWORD,
-  //       element: <ChangePasswordPage />,
-  //     },
-  //   ],
-  // },
 ]);

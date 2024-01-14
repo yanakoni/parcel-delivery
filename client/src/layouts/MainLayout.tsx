@@ -25,7 +25,6 @@ const Drawer = styled(MuiDrawer)(() => ({
     padding: '41px 22px',
     borderRight: 'none',
     height: '100vh',
-    position: 'sticky',
   },
 }));
 
