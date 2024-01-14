@@ -5,39 +5,13 @@ export const styles: {
 } = {
   container: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
   },
   balanceHistoryGraph: {
     '& .MuiBarElement-root': {
       strokeWidth: 4,
       fill: '#5B87ED',
-    },
-    '& .MuiHighlightElement-root': {
-      fill: '#205EEE',
-      borderRadius: '50%',
-      outline: '2px solid #FFF',
-      boxShadow: ' 0px 0px 10px 10px rgba(0,0,0,0.7)',
-    },
-    '& .MuiChartsAxis-tick': {
-      display: 'none',
-    },
-    '& .MuiChartsAxis-line': {
-      stroke: '#9C9C9C',
-    },
-    '& .MuiChartsAxis-tickLabel': {
-      fill: '#9C9C9C',
-    },
-  },
-  profitLossGraph: {
-    marginBottom: '35px',
-
-    '& .MuiLineElement-root': {
-      strokeWidth: 4,
-      stroke: '#205EEE',
-    },
-    '& .MuiAreaElement-series-totalProfitLoss': {
-      fill: "url('#gradient')",
     },
     '& .MuiHighlightElement-root': {
       fill: '#205EEE',

@@ -1,5 +1,3 @@
-export * from './BalanceHistoryGraph';
-export * from './CurrentOpenTradesTable';
-export * from './HistoryTable';
+export * from './PackagesGraph';
+export * from './OrderTable';
 export * from './ListOfClientsTable';
-export * from './ProfitLossGraph';

@@ -21,7 +21,6 @@ import { store } from './store';
 import { keycloak } from './consts';
 import { AuthClientError, AuthClientEvent } from '@react-keycloak/core/lib/types';
 import { ReactKeycloakProvider } from '@react-keycloak/web';
-import { Loader } from './components';
 
 const handleOnEvent = async (event: AuthClientEvent, _error?: AuthClientError) => {
   if (_error) {
@@ -46,13 +45,13 @@ const handleOnEvent = async (event: AuthClientEvent, _error?: AuthClientError) =
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <Provider store={store}>
     <ReactKeycloakProvider
-    authClient={keycloak}
-     LoadingComponent={<Loader type="page" />}
-    onEvent={(event) => handleOnEvent(event)}
+      authClient={keycloak}
+      // LoadingComponent={<Loader type="page" />}
+      onEvent={(event) => handleOnEvent(event)}
     >
-    <React.StrictMode>
-      <App />
-    </React.StrictMode>
+      <React.StrictMode>
+        <App />
+      </React.StrictMode>
     </ReactKeycloakProvider>
   </Provider>,
 );

@@ -1,8 +1,6 @@
 import { FC } from 'react';
 import { Outlet } from 'react-router-dom';
 
-// import { keycloak } from '../consts';
-
 interface RequireAuthProps {}
 
 export const RequireAuth: FC<RequireAuthProps> = () => {
@@ -11,6 +9,5 @@ export const RequireAuth: FC<RequireAuthProps> = () => {
   // } else {
   //   (async () => keycloak.login())();
   // }
-
   return <Outlet />;
 };

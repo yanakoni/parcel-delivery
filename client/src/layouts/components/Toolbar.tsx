@@ -7,6 +7,7 @@ import { NotificationsList } from './NotificationsList';
 import { keycloak, ROUTES } from '../../consts';
 import { UserWithRole } from '../../interfaces';
 import { styles } from './styles';
+import { fixtures } from '../../pages';
 
 interface ToolbarProps {
   user: UserWithRole;
@@ -46,7 +47,7 @@ const Toolbar: FC<ToolbarProps> = ({ user, handleDrawerToggle }) => {
           <Box display="flex" alignItems="center">
             <IconButton aria-label="notifications" onClick={toggleNotifications} sx={styles.notificationsToggle}>
               <Badge
-                badgeContent={2}
+                badgeContent={fixtures.notifications.length}
                 color="error"
                 anchorOrigin={{
                   vertical: 'top',

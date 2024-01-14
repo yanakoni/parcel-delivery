@@ -121,7 +121,7 @@ const PackageSchema = object({
 
 type PackageSchemaInput = TypeOf<typeof PackageSchema>;
 
-const CreatePackage = () => {
+const CreatePackage = ({ isAdmin }: { isAdmin: boolean }) => {
   const [errors, setErrors] = useState(initialErrors);
   const methods = useForm<PackageSchemaInput>({
     resolver: zodResolver(PackageSchema),

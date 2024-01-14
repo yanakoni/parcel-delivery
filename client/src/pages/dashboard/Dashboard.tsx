@@ -1,10 +1,10 @@
 import { ClientDashboard } from './ClientDashboard';
-import { AdminDashboard } from './AdminDashboard';
-import { useCheckUserRole } from '../../hooks';
-import { USER_ROLES } from '../../consts';
+// import { AdminDashboard } from './AdminDashboard';
+// import { keycloak, USER_ROLES } from '../../consts';
 
 export const Dashboard = () => {
-  const isClient = useCheckUserRole(USER_ROLES.CLIENT);
+  // const isClient = keycloak.authenticated && (keycloak.userInfo as any)?.role === USER_ROLES.CLIENT;
 
-  return isClient ? <ClientDashboard /> : <AdminDashboard />;
+  // return isClient ? <ClientDashboard /> : <AdminDashboard />;
+  return <ClientDashboard />;
 };

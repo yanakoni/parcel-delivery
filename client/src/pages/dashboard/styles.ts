@@ -51,6 +51,11 @@ export const styles: { [key: string]: SxProps<Theme> } = {
     background: '#ECF3ED',
     color: '#007611',
   },
+  redCardIcon: {
+    ...iconStyles,
+    background: '#efe4e4',
+    color: '#a73333',
+  },
   icon: {
     width: '40px',
     height: '40px',

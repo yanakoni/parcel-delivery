@@ -3,31 +3,24 @@ import { Box, Button, Divider, Grid, List, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { Logout } from '@mui/icons-material';
 import { IMenuItem, MenuItem } from './MenuItem';
-import { useLogoutMutation } from '../../api';
-import { useAppDispatch } from '../../hooks';
-import { apiSlice } from '../../store';
-import { AppIcon } from './AppIcon';
 import { styles } from './styles';
+import { keycloak } from '../../consts';
 
 export const SideMenu = ({ menuConfig }: { menuConfig: IMenuItem[] }) => {
   const { t } = useTranslation();
-  const dispatch = useAppDispatch();
-  const [logout] = useLogoutMutation();
 
   const logOut = useCallback(async () => {
-    await logout();
-
-    dispatch(apiSlice.util.resetApiState());
-  }, [dispatch, logout]);
+    await keycloak.logout();
+  }, []);
 
   return (
     <>
       <Box sx={styles.menuContainer}>
-        <Grid container mb={3}>
-          <Grid item xs={4}>
-            <AppIcon />
+        <Grid container mb={3} spacing={2}>
+          <Grid item>
+            <img src="/android-chrome-192x192.png" alt="" width="45px" height="45px" />
           </Grid>
-          <Grid item xs={8}>
+          <Grid display="flex" alignItems="center" item>
             <Typography variant="h5" component="h1">
               EquatorExpress
             </Typography>
