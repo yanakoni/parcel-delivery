@@ -20,7 +20,7 @@ class Address {
     @Prop({ required: true })
     tel: string;
 
-    @Prop({ required: true })
+    @Prop({ required: false })
     note: string;
 }
 

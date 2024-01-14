@@ -18,12 +18,16 @@ export class PostOfficeService {
     }
 
     async create(createDto: CreatePostOfficeDto) {
-        const createdVehicle = await this.postOfficeRepository.create(createDto);
+        const createdVehicle =
+            await this.postOfficeRepository.create(createDto);
         return this.mapToDto(createdVehicle);
     }
 
     async update(id: string, updateDto: UpdatePostOfficeDto) {
-        const updatedVehicle = await this.postOfficeRepository.update(id, updateDto);
+        const updatedVehicle = await this.postOfficeRepository.update(
+            id,
+            updateDto,
+        );
         return this.mapToDto(updatedVehicle);
     }
 

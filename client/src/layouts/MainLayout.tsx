@@ -1,13 +1,6 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import {
-  styled,
-  CssBaseline,
-  Drawer as MuiDrawer,
-  Box,
-  AppBar as MuiAppBar,
-  AppBarProps,
-} from '@mui/material';
+import { AppBar as MuiAppBar, AppBarProps, Box, CssBaseline, Drawer as MuiDrawer, styled } from '@mui/material';
 import { SideMenu, Toolbar } from './components';
 import { UserContext } from '../contexts/userContext';
 import { selectUser } from '../store';
@@ -56,9 +49,7 @@ export const MainLayout = () => {
             ml: { sm: `${drawerWidth}px` },
           }}
         >
-          {user && (
-            <Toolbar handleDrawerToggle={handleDrawerToggle} user={user} />
-          )}
+          {user && <Toolbar handleDrawerToggle={handleDrawerToggle} user={user} />}
         </AppBar>
         <Box
           component="nav"
@@ -105,12 +96,10 @@ export const MainLayout = () => {
           component="main"
           sx={{
             backgroundColor: (theme) =>
-              theme.palette.mode === 'light'
-                ? theme.palette.grey[100]
-                : theme.palette.grey[900],
+              theme.palette.mode === 'light' ? theme.palette.grey[100] : theme.palette.grey[900],
           }}
         >
-          <Box sx={{ p: { sm: 6 }, paddingTop: { xs: '160px', sm: '162px' } }}>
+          <Box sx={{ p: { sm: 6 }, paddingTop: { xs: '160px', sm: '162px' }, minHeight: '100vh' }}>
             <Outlet />
           </Box>
         </Box>

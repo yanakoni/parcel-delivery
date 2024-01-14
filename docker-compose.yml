@@ -66,7 +66,7 @@ services:
 #      context: client
 #    container_name: ui
 #    ports:
-#      - "4173:4173"
+#      - "5173:5173"
 #    environment:
 #      MODE: development
 #      VITE_BASE_URL: http://localhost:8080

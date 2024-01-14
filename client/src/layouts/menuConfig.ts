@@ -1,4 +1,4 @@
-import { GridView, PersonOutline, LocalShipping, Business } from '@mui/icons-material';
+import { Business, GridView, Inventory, LocalShipping, PersonOutline } from '@mui/icons-material';
 import { IMenuItem } from './components';
 import { ENTITIES, ROUTES } from '../consts';
 
@@ -26,6 +26,12 @@ export const menuConfig: IMenuItem[] = [
     label: 'Post Offices',
     icon: Business,
     to: `${ENTITIES.POST_OFFICES}`,
+  },
+  {
+    id: 'createPackage',
+    label: 'New Package',
+    icon: Inventory,
+    to: `${ENTITIES.CREATE_PACKAGE}`,
   },
   // for routes: ModeOfTravel
 ];

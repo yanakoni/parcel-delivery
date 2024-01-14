@@ -8,7 +8,8 @@ import { PostOffice } from './postOffice.model';
 @Injectable()
 export class PostOfficeRepository implements RepositoryInterface<PostOffice> {
     constructor(
-        @InjectModel(PostOffice.name) private postOfficeModel: Model<PostOffice>,
+        @InjectModel(PostOffice.name)
+        private postOfficeModel: Model<PostOffice>,
     ) {}
 
     async findAll(): Promise<PostOffice[]> {

@@ -3,6 +3,7 @@ export * from './PaginatedTable';
 export * from './Authenticate';
 export * from './AutocompleteSearch';
 export * from './ClientPage';
+export * from './ControlledAccordion';
 export * from './CreateFormWrapper';
 export * from './CustomNoRowsOverlay';
 export * from './FormInput';
