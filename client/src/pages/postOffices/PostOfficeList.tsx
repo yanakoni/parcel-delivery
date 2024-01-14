@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
+import { Box, Button, Grid, Modal, TextField, Typography, Accordion, AccordionDetails, AccordionSummary, } from '@mui/material';
 import { styles } from '../dashboard/styles';
 import { CustomNoRowsOverlay } from '../../components';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
@@ -9,36 +9,61 @@ import { number, object, string, TypeOf } from 'zod';
 import { showNotification } from '../../utils';
 import { hasErrorMessage, isApiError, isZodError } from '../../guards';
 import { LoadingButton } from '@mui/lab';
+import { ExpandMore as ExpandMoreIcon } from '@mui/icons-material';
 
 type PostOfficeForm = {
   id: string | null;
   name: string;
-  type: string;
-  manufacturer: string;
-  capacity: number;
+  workingHours: string;
+  contactNumber: string;
+  servicesOffered: string;
+  address: {
+    country: string,
+    city: string,
+    street: string,
+    zipCode: string,
+  };
 };
 
 const initialErrors: any = {
   name: '',
-  type: '',
-  manufacturer: '',
-  capacity: '',
+  workingHours: '',
+  contactNumber: '',
+  servicesOffered: '',
+  address: {
+    country: '',
+    city: '',
+    street: '',
+    zipCode: '',
+  },
 };
 
 const initialValues: PostOfficeForm = {
   id: null,
   name: '',
-  type: '',
-  manufacturer: '',
-  capacity: 0,
+  workingHours: '',
+  contactNumber: '',
+  servicesOffered: '',
+  address: {
+    country: '',
+    city: '',
+    street: '',
+    zipCode: '',
+  }
 };
 
 const PostOfficeSchema = object({
   id: string().nullable().optional(),
   name: string().nonempty('Name is required'),
-  type: string().nonempty('Type is required'),
-  manufacturer: string().nonempty('Manufacturer is required'),
-  capacity: number().min(0, 'Capacity must be greater than or equal to 0'),
+  workingHours: string().nonempty('Working Hours is required'),
+  contactNumber: string().nonempty('Contact Number is required'),
+  servicesOffered: string().nonempty('Services Offered is required'),
+  address: object({
+    country: string().nonempty('Country is required'),
+    city: string().nonempty('City is required'),
+    street: string().nonempty('Street is required'),
+    zipCode: string().nonempty('ZipCode is required'),
+  })
 });
 
 type PostOfficeSchemaInput = TypeOf<typeof PostOfficeSchema>;
@@ -59,30 +84,46 @@ const columns = (onDelete: (id: string) => Promise<void>, onEdit: (id: string) =
     headerAlign: 'center',
   },
   {
-    field: 'type',
-    headerName: 'Type',
+    field: 'workingHours',
+    headerName: 'Working Hours',
     flex: 1,
     align: 'center',
     headerAlign: 'center',
   },
   {
-    field: 'manufacturer',
-    headerName: 'Manufacturer',
+    field: 'contactNumber',
+    headerName: 'Contact Number',
     flex: 1,
     align: 'center',
     headerAlign: 'center',
   },
   {
-    field: 'capacity',
-    headerName: 'Capacity',
+    field: 'servicesOffered',
+    headerName: 'Services Offered',
     flex: 1,
     align: 'center',
     headerAlign: 'center',
+  },
+  {
+    field: 'address',
+    headerName: 'Address',
+    flex: 2,
+    align: 'center',
+    headerAlign: 'center',
+    renderCell: (params: any) => {
+      return <Grid container spacing={2}>
+      <Grid item xs={12}>
+        <Typography>
+          {`${params.row.address.street}, ${params.row.address.city}, ${params.row.address.country}, ${params.row.address.zipCode}`}
+        </Typography>
+      </Grid>
+    </Grid>;
+    },
   },
   {
     field: 'delete',
     headerName: '',
-    flex: 1,
+    flex: 0.5,
     align: 'center',
     headerAlign: 'center',
     renderCell: (params: any) => {
@@ -92,7 +133,7 @@ const columns = (onDelete: (id: string) => Promise<void>, onEdit: (id: string) =
   {
     field: 'edit',
     headerName: '',
-    flex: 1,
+    flex: 0.5,
     align: 'center',
     headerAlign: 'center',
     renderCell: (params: any) => {
@@ -188,9 +229,15 @@ const PostOfficeList = () => {
         const data = {
           id: editedPostOffice.id as string,
           name: formData.get('name') as string,
-          type: formData.get('type') as string,
-          manufacturer: formData.get('manufacturer') as string,
-          capacity: parseInt(formData.get('capacity') as string),
+          workingHours: formData.get('workingHours') as string,
+          contactNumber: formData.get('contactNumber') as string,
+          servicesOffered: formData.get('servicesOffered') as string,
+          address: {
+            country: formData.get('address.country') as string,
+            city: formData.get('address.city') as string,
+            street: formData.get('address.street') as string,
+            zipCode: formData.get('address.zipCode') as string,
+          }
         };
 
         const validatedData = PostOfficeSchema.parse(data);
@@ -249,9 +296,15 @@ const PostOfficeList = () => {
 
         const data = {
           name: formData.get('name') as string,
-          type: formData.get('type') as string,
-          manufacturer: formData.get('manufacturer') as string,
-          capacity: parseInt(formData.get('capacity') as string),
+          workingHours: formData.get('workingHours') as string,
+          contactNumber: formData.get('contactNumber') as string,
+          servicesOffered: formData.get('servicesOffered') as string,
+          address: {
+            country: formData.get('address.country') as string,
+            city: formData.get('address.city') as string,
+            street: formData.get('address.street') as string,
+            zipCode: formData.get('address.zipCode') as string,
+          }
         };
 
         const validatedData = PostOfficeSchema.parse(data);
@@ -345,41 +398,110 @@ const PostOfficeList = () => {
                 </Grid>
                 <Grid xs={12} md={6} item>
                   <TextField
-                    id="type"
-                    name="type"
-                    label="Type"
+                    id="contactNumber"
+                    name="contactNumber"
+                    label="Contact Number"
                     type="text"
                     autoComplete="off"
-                    defaultValue={editedPostOffice?.type}
-                    helperText={errors.type}
-                    error={!!errors.type}
+                    defaultValue={editedPostOffice?.contactNumber}
+                    helperText={errors.contactNumber}
+                    error={!!errors.contactNumber}
                     fullWidth
+                    autoFocus
                   />
                 </Grid>
                 <Grid xs={12} md={6} item>
                   <TextField
-                    id="manufacturer"
-                    name="manufacturer"
-                    label="Manufacturer"
+                    id="workingHours"
+                    name="workingHours"
+                    label="Working Hours"
                     type="text"
                     autoComplete="off"
-                    defaultValue={editedPostOffice?.manufacturer}
-                    helperText={errors.manufacturer}
-                    error={!!errors.manufacturer}
+                    defaultValue={editedPostOffice?.workingHours}
+                    helperText={errors.workingHours}
+                    error={!!errors.workingHours}
                     fullWidth
+                    autoFocus
                   />
                 </Grid>
                 <Grid xs={12} md={6} item>
                   <TextField
-                    id="capacity"
-                    name="capacity"
-                    label="Capacity"
-                    type="number"
-                    defaultValue={editedPostOffice?.capacity}
-                    helperText={errors.capacity}
-                    error={!!errors.capacity}
+                    id="servicesOffered"
+                    name="servicesOffered"
+                    label="Services Offered"
+                    type="text"
+                    autoComplete="off"
+                    defaultValue={editedPostOffice?.servicesOffered}
+                    helperText={errors.servicesOffered}
+                    error={!!errors.servicesOffered}
                     fullWidth
+                    autoFocus
                   />
+                </Grid>
+                <Grid xs={12} md={6} item>
+                <Accordion key={'post-office-create'} expanded={true}>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls={`bh-content`}
+                    id={`bh-header`}
+                  >
+                    <Typography sx={{ width: '33%', flexShrink: 12 }}>{'Address'}</Typography>
+                  </AccordionSummary>
+                <AccordionDetails>
+                  <Grid item>
+                    <TextField
+                      id="country"
+                      name="address.country"
+                      label="Country"
+                      type="text"
+                      autoComplete="off"
+                      defaultValue={editedPostOffice?.address.country}
+                      helperText={errors.address.country}
+                      error={!!errors.address.country}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      id="city"
+                      name="address.city"
+                      label="City"
+                      type="text"
+                      autoComplete="off"
+                      defaultValue={editedPostOffice?.address.city}
+                      helperText={errors.address.city}
+                      error={!!errors.address.city}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      id="street"
+                      name="address.street"
+                      label="Street"
+                      type="text"
+                      autoComplete="off"
+                      defaultValue={editedPostOffice?.address.street}
+                      helperText={errors.address.street}
+                      error={!!errors.address.street}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      id="zipCode"
+                      name="address.zipCode"
+                      label="Zip Code"
+                      type="text"
+                      autoComplete="off"
+                      defaultValue={editedPostOffice?.address.zipCode}
+                      helperText={errors.address.zipCode}
+                      error={!!errors.address.zipCode}
+                      fullWidth
+                    />
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
                 </Grid>
               </Grid>
               <LoadingButton type="submit" variant="contained" sx={styles.formButton}>
@@ -410,38 +532,103 @@ const PostOfficeList = () => {
                 </Grid>
                 <Grid xs={12} md={6} item>
                   <TextField
-                    id="type"
-                    name="type"
-                    label="Type"
+                    id="contactNumber"
+                    name="contactNumber"
+                    label="Contact Number"
                     type="text"
                     autoComplete="off"
-                    helperText={errors.type}
-                    error={!!errors.type}
+                    helperText={errors.contactNumber}
+                    error={!!errors.contactNumber}
                     fullWidth
+                    autoFocus
                   />
                 </Grid>
                 <Grid xs={12} md={6} item>
                   <TextField
-                    id="manufacturer"
-                    name="manufacturer"
-                    label="Manufacturer"
+                    id="workingHours"
+                    name="workingHours"
+                    label="Working Hours"
                     type="text"
                     autoComplete="off"
-                    helperText={errors.manufacturer}
-                    error={!!errors.manufacturer}
+                    helperText={errors.workingHours}
+                    error={!!errors.workingHours}
                     fullWidth
+                    autoFocus
                   />
                 </Grid>
                 <Grid xs={12} md={6} item>
                   <TextField
-                    id="capacity"
-                    name="capacity"
-                    label="Capacity"
-                    type="number"
-                    helperText={errors.capacity}
-                    error={!!errors.capacity}
+                    id="servicesOffered"
+                    name="servicesOffered"
+                    label="Services Offered"
+                    type="text"
+                    autoComplete="off"
+                    helperText={errors.servicesOffered}
+                    error={!!errors.servicesOffered}
                     fullWidth
+                    autoFocus
                   />
+                </Grid>
+                <Grid xs={12} md={6} item>
+                <Accordion key={'post-office-create'} expanded={true}>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls={`bh-content`}
+                    id={`bh-header`}
+                  >
+                    <Typography sx={{ width: '33%', flexShrink: 12 }}>{'Address'}</Typography>
+                  </AccordionSummary>
+                <AccordionDetails>
+                  <Grid item>
+                    <TextField
+                      id="country"
+                      name="address.country"
+                      label="Country"
+                      type="text"
+                      autoComplete="off"
+                      helperText={errors.address.country}
+                      error={!!errors.address.country}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      id="city"
+                      name="address.city"
+                      label="City"
+                      type="text"
+                      autoComplete="off"
+                      helperText={errors.address.city}
+                      error={!!errors.address.city}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      id="street"
+                      name="address.street"
+                      label="Street"
+                      type="text"
+                      autoComplete="off"
+                      helperText={errors.address.street}
+                      error={!!errors.address.street}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      id="zipCode"
+                      name="address.zipCode"
+                      label="Zip Code"
+                      type="text"
+                      autoComplete="off"
+                      helperText={errors.address.zipCode}
+                      error={!!errors.address.zipCode}
+                      fullWidth
+                    />
+                  </Grid>
+                </AccordionDetails>
+              </Accordion>
                 </Grid>
               </Grid>
               <LoadingButton type="submit" variant="contained" sx={styles.formButton}>

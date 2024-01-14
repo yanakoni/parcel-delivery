@@ -12,11 +12,6 @@ export class AddressDto {
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    state: string;
-
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
     city: string;
 
     @IsString()
@@ -28,11 +23,6 @@ export class AddressDto {
     @IsNotEmpty()
     @ApiProperty()
     zipCode: string;
-
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty()
-    tel: string;
 }
 
 export class CreatePostOfficeDto {

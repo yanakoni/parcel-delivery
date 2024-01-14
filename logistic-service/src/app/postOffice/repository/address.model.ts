@@ -9,9 +9,6 @@ class Address {
     country: string;
 
     @Prop({ required: true })
-    state: string;
-
-    @Prop({ required: true })
     city: string;
 
     @Prop({ required: false })
@@ -19,9 +16,6 @@ class Address {
 
     @Prop({ required: false })
     zipCode: string;
-
-    @Prop({ required: true })
-    tel: string;
 
     @Prop({ required: false })
     note?: string;

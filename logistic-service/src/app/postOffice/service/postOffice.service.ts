@@ -7,8 +7,8 @@ import { PostOfficeRepository } from '../repository/postOffice.repository';
 export class PostOfficeService {
     constructor(private readonly postOfficeRepository: PostOfficeRepository) {}
 
-    async findAll() {
-        const postOffices = await this.postOfficeRepository.findAll();
+    async findAll(namePrefix?: string) {
+        const postOffices = await this.postOfficeRepository.findAll(namePrefix);
         return postOffices.map(this.mapToDto);
     }
 
