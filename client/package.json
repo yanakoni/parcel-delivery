@@ -24,6 +24,8 @@
     "@react-buddy/palette-mui": "^5.0.1",
     "@react-keycloak/web": "^3.4.0",
     "@reduxjs/toolkit": "^1.9.6",
+    "@stripe/react-stripe-js": "^2.4.0",
+    "@stripe/stripe-js": "^2.3.0",
     "axios": "^1.6.5",
     "date-fns": "^2.30.0",
     "i18next": "^23.5.1",

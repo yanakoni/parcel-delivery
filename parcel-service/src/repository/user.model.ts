@@ -2,16 +2,15 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { Address } from './address.model';
 
-
 class CardData {
-  @Prop({ required: true })
-  brand: string;
+    @Prop({ required: true })
+    brand: string;
 
-  @Prop({ required: true })
-  expDate: string;
+    @Prop({ required: true })
+    expDate: string;
 
-  @Prop({ required: true })
-  last4: any[];
+    @Prop({ required: true })
+    last4: any[];
 }
 
 class PaymentInformation {
@@ -21,7 +20,7 @@ class PaymentInformation {
     @Prop({ required: true })
     preferredLocales: string[];
 
-    @Prop({ required: true, type: [Object] })  // Specify the type as an array of objects
+    @Prop({ required: true, type: [Object] }) // Specify the type as an array of objects
     sources: any[];
 
     @Prop({ required: true })
@@ -31,7 +30,7 @@ class PaymentInformation {
     metadata: any;
 
     @Prop({ required: true })
-    card: CardData
+    card: CardData;
 }
 
 // Represents a user
@@ -47,7 +46,7 @@ class User {
     email: string;
 
     // TODO
-    @Prop({ required: true, type: [Object] })
+    @Prop({ required: true, type: Object })
     profileInformation: any;
 
     // TODO ???
@@ -59,11 +58,11 @@ class User {
     favouriteAddresses: Address[];
 
     // TODO
-    @Prop({ required: true })
+    @Prop({ required: true, type: Object })
     paymentInformation: PaymentInformation;
 
     // TODO
-    @Prop({ required: true, type: [Object] })
+    @Prop({ required: true, type: Object })
     preferences: any;
 
     // TODO

@@ -51,7 +51,7 @@ export const menuConfig: IMenuItem[] = [
     label: 'Payments',
     icon: Payments,
     to: `${ENTITIES.PAYMENTS}`,
-    roles: [USER_ROLES.ADMIN],
+    roles: [USER_ROLES.ADMIN, USER_ROLES.CLIENT],
   },
   {
     id: 'orders',
@@ -60,5 +60,4 @@ export const menuConfig: IMenuItem[] = [
     to: `${ENTITIES.ORDERS}`,
     roles: [USER_ROLES.ADMIN],
   },
-  // for routes: ModeOfTravel
 ];

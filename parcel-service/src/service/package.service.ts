@@ -4,13 +4,17 @@ import { Package, PackageRepository } from '../repository';
 import { PackageServiceInterface } from './package.service.interface';
 import { FilterQuery, PipelineStage } from 'mongoose';
 import { ParcelStatus } from '../enums';
+import { PriceEstimationService } from './price-estimation.service';
 
 @Injectable()
 export class PackageService
     implements
         PackageServiceInterface<Package, CreatePackageDto, UpdatePackageDto>
 {
-    constructor(private readonly packageRepository: PackageRepository) {}
+    constructor(
+        private readonly packageRepository: PackageRepository,
+        private readonly priceEstimationService: PriceEstimationService,
+    ) {}
 
     async findAll(filter?: FilterQuery<Package>): Promise<Package[]> {
         return this.packageRepository.findAll(filter);
@@ -25,7 +29,10 @@ export class PackageService
         createDto.updatedAt = new Date();
         createDto.status = ParcelStatus.REGISTERED;
         // TODO: use price estimation service
-        createDto.price = 0;
+        createDto.price = await this.priceEstimationService.estimatePrice(
+            createDto.dimensions,
+            createDto.weight,
+        );
 
         return this.packageRepository.create(createDto);
     }

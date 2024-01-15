@@ -1,8 +1,4 @@
-import {
-    BadRequestException,
-    Inject,
-    Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { FilterQuery, Model, PipelineStage } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { RepositoryInterface } from './package.repository.interface';
@@ -11,7 +7,7 @@ import { Package } from './package.model';
 @Injectable()
 export class PackageRepository implements RepositoryInterface<Package> {
     constructor(
-        @InjectModel(Package.name) private packageModel: Model<Package>
+        @InjectModel(Package.name) private packageModel: Model<Package>,
     ) {}
 
     async findAll(filter: FilterQuery<Package> = {}): Promise<Package[]> {

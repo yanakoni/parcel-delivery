@@ -21,7 +21,7 @@ class Address {
     tel: string;
 
     @Prop({ required: false })
-    note: string;
+    note?: string;
 }
 
 const AddressSchema = SchemaFactory.createForClass(Address);
