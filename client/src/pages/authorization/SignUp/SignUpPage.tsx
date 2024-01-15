@@ -38,7 +38,6 @@ export const SignUpPage = () => {
 
   const onSubmitHandler: SubmitHandler<SignUpWithTokenSchemaInput | SignUpWithoutTokenSchemaInput> = useCallback(
     async (values) => {
-      console.log(values);
       const { first_name, last_name, password } = values;
 
       const dataToSave = {

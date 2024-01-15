@@ -56,7 +56,7 @@ class Package {
 
     // TODO: maybe we should have ability to create a package
     //  and set it to be received at post office at a later date
-    @Prop({ required: true })
+    @Prop({ required: false })
     receivedAt: Date;
 
     @Prop({ required: true })

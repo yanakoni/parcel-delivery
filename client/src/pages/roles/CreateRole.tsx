@@ -1,5 +1,5 @@
 import { FC, useCallback, useMemo, useState } from 'react';
-import { useForm, SubmitHandler, FormProvider } from 'react-hook-form';
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { object, preprocess, string, TypeOf } from 'zod';
 import { useTranslation } from 'react-i18next';
 import { grey } from '@mui/material/colors';
@@ -12,21 +12,13 @@ import { CreateEntityPageProps } from '../../entity-crud';
 import { CreateRole } from '../../interfaces';
 
 const createRoleSchema = object({
-  name: string()
-    .nonempty('Name is required')
-    .max(32, 'Name must be less than 100 characters'),
-  description: preprocess(
-    (s) => (s === '' ? null : s),
-    string().min(1).nullable(),
-  ),
+  name: string().nonempty('Name is required').max(32, 'Name must be less than 100 characters'),
+  description: preprocess((s) => (s === '' ? null : s), string().min(1).nullable()),
 });
 
 type CreateRoleInput = TypeOf<typeof createRoleSchema>;
 
-export const CreateRolePage: FC<CreateEntityPageProps<CreateRole>> = ({
-  create,
-  isLoading,
-}) => {
+export const CreateRolePage: FC<CreateEntityPageProps<CreateRole>> = ({ create, isLoading }) => {
   const { t } = useTranslation();
 
   const [permissions, setPermissions] = useState<string[]>([]);
@@ -50,7 +42,6 @@ export const CreateRolePage: FC<CreateEntityPageProps<CreateRole>> = ({
   const { handleSubmit } = methods;
 
   const onSubmitHandler: SubmitHandler<CreateRoleInput> = async (values) => {
-    console.log(values);
     await create({
       ...values,
       accessScope: permissionsToSave,
@@ -84,12 +75,7 @@ export const CreateRolePage: FC<CreateEntityPageProps<CreateRole>> = ({
             <PermissionList initiallyChecked={[]} onData={onPermissionsCheck} />
           </Grid>
           <Grid item xs={12} lg={9}>
-            <LoadingButton
-              type="submit"
-              loading={isLoading}
-              fullWidth
-              variant="contained"
-            >
+            <LoadingButton type="submit" loading={isLoading} fullWidth variant="contained">
               {t('create.createButton')}
             </LoadingButton>
           </Grid>

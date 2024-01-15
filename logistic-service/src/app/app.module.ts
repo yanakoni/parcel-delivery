@@ -24,16 +24,16 @@ import configuration from './config/configuration';
         ConfigService,
     ],
     imports: [
-      ConfigModule.forRoot({
-        load: [configuration],
-        isGlobal: true
-      }),
-      MongooseModule.forRootAsync({
-        inject: [ConfigService],
-          useFactory: (configService: ConfigService) => ({
-              uri: configService.get('DB_CONN_STRING'),
-          }),
-      }),
+        ConfigModule.forRoot({
+            load: [configuration],
+            isGlobal: true,
+        }),
+        MongooseModule.forRootAsync({
+            inject: [ConfigService],
+            useFactory: (configService: ConfigService) => ({
+                uri: configService.get('DB_CONN_STRING'),
+            }),
+        }),
         MongooseModule.forFeature([
             {
                 name: Vehicle.name,

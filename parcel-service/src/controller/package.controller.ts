@@ -16,6 +16,7 @@ import { CreatePackageDto, UpdatePackageDto } from '../dtos';
 import { PackageService } from '../service';
 import { Package } from '../repository';
 import { Sort } from '../types';
+import { ParcelStatus } from '../enums';
 
 @ApiTags('Packages')
 @Controller('package')
@@ -48,6 +49,16 @@ export class PackageController {
         return { data: updatedPackage };
     }
 
+    @Put('/status')
+    @Roles({ roles: ['admin'] })
+    @Scopes('Update')
+    async updateStatus(@Query('_id') _id: string) {
+        const updatedPackage = await this.parcelService.update(_id, {
+            status: ParcelStatus.PENDING,
+        });
+        return { data: updatedPackage };
+    }
+
     @Delete(':id')
     @Roles({ roles: ['user', 'admin'] })
     @Scopes('Delete')
@@ -56,7 +67,8 @@ export class PackageController {
         return { data: deletedPackage };
     }
 
-    @Roles({ roles: ['user', 'admin'] })
+    @Public()
+    @Get()
     public async getPaginated(
         @Query('filter') filter?: string,
         @Query('sort') sort?: string,

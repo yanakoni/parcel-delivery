@@ -2,7 +2,7 @@ import { FC, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Grid, Typography } from '@mui/material';
 import LoadingButton from '@mui/lab/LoadingButton';
-import { useForm, SubmitHandler, FormProvider } from 'react-hook-form';
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
 import { object, string, TypeOf } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { grey } from '@mui/material/colors';
@@ -12,9 +12,7 @@ import { EditEntityPageProps } from '../../entity-crud';
 import { EditRole, Role } from '../../interfaces';
 
 const createRoleSchema = object({
-  name: string()
-    .nonempty('Name is required')
-    .max(32, 'Name must be less than 100 characters'),
+  name: string().nonempty('Name is required').max(32, 'Name must be less than 100 characters'),
   description: string(),
 });
 
@@ -40,9 +38,7 @@ export const EditRolePage: FC<EditEntityPageProps<Role, EditRole>> = ({
   const initiallyCheckedPermissions = useMemo<string[]>(() => {
     if (!entityData) return [];
 
-    return Object.keys(entityData.accessScope).filter(
-      (permission) => entityData.accessScope[permission],
-    );
+    return Object.keys(entityData.accessScope).filter((permission) => entityData.accessScope[permission]);
   }, [entityData]);
 
   const onPermissionsCheck = useCallback((values: string[]) => {
@@ -56,7 +52,6 @@ export const EditRolePage: FC<EditEntityPageProps<Role, EditRole>> = ({
   const { handleSubmit } = methods;
 
   const onSubmitHandler: SubmitHandler<CreateRoleInput> = (values) => {
-    console.log(values);
     update({
       ...values,
       accessScope: permissionsToSave,
@@ -83,12 +78,7 @@ export const EditRolePage: FC<EditEntityPageProps<Role, EditRole>> = ({
             </Typography>
           </Grid>
           <Grid item xs={12} lg={9}>
-            <FormInput
-              disabled={entityData?.system}
-              name="name"
-              label="Name"
-              defaultValue={entityData?.name}
-            />
+            <FormInput disabled={entityData?.system} name="name" label="Name" defaultValue={entityData?.name} />
           </Grid>
           <Grid item xs={12} lg={9}>
             <FormInput
@@ -107,12 +97,7 @@ export const EditRolePage: FC<EditEntityPageProps<Role, EditRole>> = ({
           </Grid>
           {!entityData?.system && (
             <Grid item xs={12} lg={9}>
-              <LoadingButton
-                type="submit"
-                loading={isLoading}
-                fullWidth
-                variant="contained"
-              >
+              <LoadingButton type="submit" loading={isLoading} fullWidth variant="contained">
                 {t('edit.editButton')}
               </LoadingButton>
             </Grid>

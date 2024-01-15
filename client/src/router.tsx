@@ -8,6 +8,7 @@ import {
   CreatePackage,
   Dashboard,
   ErrorPage,
+  PaymentsTable,
   PostOfficeList,
   ProfilePage,
   ResetPasswordPage,
@@ -81,6 +82,14 @@ export const router = createBrowserRouter([
             ],
           },
           {
+            children: [
+              {
+                path: ROUTES.PAYMENTS,
+                element: <PaymentsTable isAdmin />,
+              },
+            ],
+          },
+          {
             path: ROUTES.ENTITY_LIST,
             element: <EntityList />,
           },
@@ -119,6 +128,14 @@ export const router = createBrowserRouter([
           {
             path: ROUTES.CREATE_PACKAGE,
             element: <CreatePackage isAdmin={false} />,
+          },
+        ],
+      },
+      {
+        children: [
+          {
+            path: ROUTES.PAYMENTS,
+            element: <PaymentsTable isAdmin={false} />,
           },
         ],
       },

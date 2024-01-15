@@ -6,11 +6,11 @@ services:
    volumes:
    - kc_db_data:/var/lib/postgresql/data
    environment:
-     POSTGRES_DB: ${KC_PG_DB}
-     POSTGRES_USER: ${KC_PG_USER}
-     POSTGRES_PASSWORD: ${KC_PG_PASSWORD}
+     POSTGRES_DB: parcel-iam-db
+     POSTGRES_USER: postgres
+     POSTGRES_PASSWORD: postgres
    healthcheck:
-     test: ["CMD-SHELL", "pg_isready -U ${KC_PG_USER} -d ${KC_PG_DB}"]
+     test: ["CMD-SHELL", "pg_isready -U postgres -d parcel-iam-db"]
      interval: 3s
      timeout: 5s
      retries: 3
@@ -20,13 +20,13 @@ services:
    environment:
      DB_VENDOR: POSTGRES
      DB_ADDR: keycloak-db
-     DB_DATABASE: ${KC_PG_DB}
-     DB_USER: ${KC_PG_USER}
+     DB_DATABASE: parcel-iam-db
+     DB_USER: postgres
      DB_SCHEMA: public
-     DB_PASSWORD: ${KC_PG_PASSWORD}
+     DB_PASSWORD: postgres
      KC_FEATURES: web-authn,authorization,admin-api,account-api,admin-fine-grained-authz,docker,token-exchange,recovery-codes
-     KEYCLOAK_ADMIN: ${KC_USER}
-     KEYCLOAK_ADMIN_PASSWORD: ${KC_PASSWORD}
+     KEYCLOAK_ADMIN: admin
+     KEYCLOAK_ADMIN_PASSWORD: password
    ports:
      - "8080:8080"
    command: ['start-dev', "--import-realm"]

@@ -1,21 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
+import {
+    IsDateString,
+    IsEnum,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+} from 'class-validator';
 import { Type } from 'class-transformer';
-import { Address, Dimension } from '../repository';
 import { ParcelStatus } from '../enums';
 
 class DimensionDto {
-  @IsNotEmpty()
-  @ApiProperty()
-  length: number;
+    @IsNotEmpty()
+    @ApiProperty()
+    length: number;
 
-  @IsNotEmpty()
-  @ApiProperty()
-  width: number;
+    @IsNotEmpty()
+    @ApiProperty()
+    width: number;
 
-  @IsNotEmpty()
-  @ApiProperty()
-  height: number;
+    @IsNotEmpty()
+    @ApiProperty()
+    height: number;
 }
 
 class AddressDto {
@@ -65,46 +70,57 @@ export class CreatePackageDto {
     @ApiProperty()
     weight: number;
 
+    @IsOptional()
     // @Transform(({ obj: { _id } }) => _id?.toString())
     @ApiProperty()
     departurePostOffice?: string;
 
+    @IsOptional()
     // @Transform(({ obj: { _id } }) => _id?.toString())
     @ApiProperty()
     destinationPostOffice?: string;
 
+    @IsOptional()
     @Type(() => AddressDto)
     @ApiProperty()
     departureAddress?: AddressDto;
 
+    @IsOptional()
     @Type(() => AddressDto)
     @ApiProperty()
     destinationAddress?: AddressDto;
 
+    @IsOptional()
     @IsEnum(ParcelStatus)
-    @ApiProperty({enum: ParcelStatus, default: ParcelStatus.PENDING})
+    @ApiProperty({ enum: ParcelStatus, default: ParcelStatus.PENDING })
     status?: ParcelStatus;
 
+    @IsOptional()
     @IsNumber()
     @ApiProperty()
     price?: number;
 
+    @IsOptional()
     @IsDateString()
     @ApiProperty()
     estimatedPickUpTime?: Date;
 
+    @IsOptional()
     @IsDateString()
     @ApiProperty()
     estimatedDeliveryTime?: Date;
 
+    @IsOptional()
     @IsDateString()
     @ApiProperty()
     createdAt?: Date;
 
+    @IsOptional()
     @IsDateString()
     @ApiProperty()
     receivedAt?: Date;
 
+    @IsOptional()
     @IsDateString()
     @ApiProperty()
     updatedAt?: Date;

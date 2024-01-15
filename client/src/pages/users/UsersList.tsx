@@ -220,11 +220,7 @@ const UsersList = () => {
         email: formData.get('email') as string,
       };
 
-      console.log(data);
-
       const validatedData = UserSchema.parse(data);
-
-      console.log(validatedData);
 
       // const response = await fetch('http://localhost:5000/api/users', {
       //   method: 'POST',

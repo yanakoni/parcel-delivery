@@ -11,6 +11,7 @@ import { showNotification } from '../../utils';
 import { hasErrorMessage, isApiError, isZodError } from '../../guards';
 import { ControlledAccordion } from '../../components';
 import { accordions, AccordionsProps } from './accordions';
+import { PaymentPage } from './PaymentPage';
 
 type PackageForm = {
   id: number | null;
@@ -122,6 +123,8 @@ const PackageSchema = object({
 type PackageSchemaInput = TypeOf<typeof PackageSchema>;
 
 const CreatePackage = ({ isAdmin }: { isAdmin: boolean }) => {
+  const [packageDetails, setPackageDetails] = useState({ _id: null, price: 0 });
+  const [showPayment, setShowPayment] = useState(false);
   const [errors, setErrors] = useState(initialErrors);
   const methods = useForm<PackageSchemaInput>({
     resolver: zodResolver(PackageSchema),
@@ -186,7 +189,7 @@ const CreatePackage = ({ isAdmin }: { isAdmin: boolean }) => {
       };
 
       const data = {
-        sender: formData.get('sender'),
+        sender: formData.get('sender') || 'test',
         senderObj: {
           username: formData.get('senderObj.username'),
           email: formData.get('senderObj.email'),
@@ -204,8 +207,6 @@ const CreatePackage = ({ isAdmin }: { isAdmin: boolean }) => {
         destinationAddress: destinationAddress.country ? destinationAddress : null,
       };
 
-      console.log(data);
-
       const validatedData = PackageSchema.parse(data);
 
       const response = await fetch('http://localhost:3001/package', {
@@ -217,7 +218,13 @@ const CreatePackage = ({ isAdmin }: { isAdmin: boolean }) => {
       });
 
       if (response.ok) {
-        showNotification('Package successfully created', 'success');
+        setShowPayment(true);
+        const {
+          data: { price, _id },
+        } = await response.json();
+        console.log(_id, price);
+
+        setPackageDetails({ _id, price });
       } else {
         showNotification('Failed to create package', 'error');
       }
@@ -245,14 +252,17 @@ const CreatePackage = ({ isAdmin }: { isAdmin: boolean }) => {
   return (
     <Box height="100vh">
       <Typography variant="h2">Create Package</Typography>
-      <FormProvider {...methods}>
-        <Box component="form" onSubmit={onCreate} sx={{ minHeight: '100vh' }} mt={4} noValidate>
-          <ControlledAccordion accordions={accordions(accordionConfig)} />
-          <LoadingButton type="submit" variant="contained" sx={styles.formButton}>
-            Create
-          </LoadingButton>
-        </Box>
-      </FormProvider>
+      {!showPayment && (
+        <FormProvider {...methods}>
+          <Box component="form" onSubmit={onCreate} sx={{ minHeight: '100vh' }} mt={4} noValidate>
+            <ControlledAccordion accordions={accordions(accordionConfig)} />
+            <LoadingButton type="submit" variant="contained" sx={styles.formButton}>
+              Create
+            </LoadingButton>
+          </Box>
+        </FormProvider>
+      )}
+      {showPayment && <PaymentPage price={packageDetails.price} packageId={packageDetails._id || ''} />}
     </Box>
   );
 };
