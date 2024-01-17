@@ -1,22 +1,39 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge, Box, Button, Divider, IconButton, Toolbar as MuiToolbar, Typography } from '@mui/material';
 import { Menu, NotificationsNone, PersonOutline } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import { grey } from '@mui/material/colors';
 import { NotificationsList } from './NotificationsList';
-import { keycloak, ROUTES } from '../../consts';
-import { UserWithRole } from '../../interfaces';
+import { keycloak, ROUTES, USER_ROLES } from '../../consts';
 import { styles } from './styles';
 import { fixtures } from '../../pages';
+import { isKeycloakUserInfo } from '../../guards';
 
 interface ToolbarProps {
-  user: UserWithRole;
   handleDrawerToggle: () => void;
 }
 
-const Toolbar: FC<ToolbarProps> = ({ user, handleDrawerToggle }) => {
+const Toolbar: FC<ToolbarProps> = ({ handleDrawerToggle }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [userData, setUserData] = useState({ name: '', email: '', role: '' });
+
+  useEffect(() => {
+    (async () => {
+      await keycloak.loadUserInfo();
+
+      if (!isKeycloakUserInfo(keycloak.userInfo)) return;
+
+      setUserData({
+        name: keycloak.userInfo.name,
+        email: keycloak.userInfo.email,
+        role: keycloak.realmAccess?.roles[0] || USER_ROLES.CLIENT,
+      });
+    })();
+  }, []);
+
   const openProfilePage = () => {
     navigate(ROUTES.PROFILE);
   };
@@ -67,10 +84,10 @@ const Toolbar: FC<ToolbarProps> = ({ user, handleDrawerToggle }) => {
                 </Box>
                 <Box>
                   <Typography component="p" variant="subtitle1" color="text.primary">
-                    {user.username}
+                    {userData.name}, {userData.email}
                   </Typography>
                   <Typography component="p" variant="h6" color="text.secondary">
-                    {`${user?.userRole.roleType}`}
+                    {userData.role}
                   </Typography>
                 </Box>
               </Box>
@@ -78,7 +95,7 @@ const Toolbar: FC<ToolbarProps> = ({ user, handleDrawerToggle }) => {
             {!keycloak.authenticated && (
               <Box display="flex" alignItems="center">
                 <Box mr={2}>
-                  <Button onClick={signUp}>Sign up</Button>
+                  <Button onClick={signUp}>{t('signUp.signUp')}</Button>
                 </Box>
               </Box>
             )}
