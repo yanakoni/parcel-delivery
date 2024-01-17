@@ -48,7 +48,7 @@ export const MainLayout = () => {
             ml: { sm: `${drawerWidth}px` },
           }}
         >
-          {user && <Toolbar handleDrawerToggle={handleDrawerToggle} user={user} />}
+          {user && <Toolbar handleDrawerToggle={handleDrawerToggle} />}
         </AppBar>
         <Box
           component="nav"

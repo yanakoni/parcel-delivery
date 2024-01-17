@@ -1,10 +1,9 @@
 import { ClientDashboard } from './ClientDashboard';
-// import { AdminDashboard } from './AdminDashboard';
-// import { keycloak, USER_ROLES } from '../../consts';
+import { AdminDashboard } from './AdminDashboard';
+import { keycloak, USER_ROLES } from '../../consts';
 
 export const Dashboard = () => {
-  // const isClient = keycloak.authenticated && (keycloak.userInfo as any)?.role === USER_ROLES.CLIENT;
+  const isClient = !keycloak.authenticated || keycloak.realmAccess?.roles.includes(USER_ROLES.CLIENT);
 
-  // return isClient ? <ClientDashboard /> : <AdminDashboard />;
-  return <ClientDashboard />;
+  return isClient ? <ClientDashboard /> : <AdminDashboard />;
 };
