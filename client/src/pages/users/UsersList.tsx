@@ -1,7 +1,7 @@
-import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
+import { Box, Button, Grid, Modal, TextField, Typography, Select, MenuItem, FormControl } from '@mui/material';
 import { styles } from '../dashboard/styles';
 import { CustomNoRowsOverlay } from '../../components';
-import { FormEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,33 +9,45 @@ import { number, object, string, TypeOf } from 'zod';
 import { showNotification } from '../../utils';
 import { hasErrorMessage, isApiError, isZodError } from '../../guards';
 import { LoadingButton } from '@mui/lab';
+import { getKcAdminClient } from '../../api/keycloakAdminClient';
+import UserRepresentation from '@keycloak/keycloak-admin-client/lib/defs/userRepresentation';
+import { USER_ROLES, keycloak } from '../../consts';
+import KcAdminClient from '@keycloak/keycloak-admin-client';
+import MappingsRepresentation from '@keycloak/keycloak-admin-client/lib/defs/mappingsRepresentation';
+import RoleRepresentation from '@keycloak/keycloak-admin-client/lib/defs/roleRepresentation';
+import { current } from '@reduxjs/toolkit';
 
 type UserForm = {
-  id: number | null;
-  username: string;
-  email: string;
+  id: string | null;
+  firstName: string;
+  lastName: string;
+  role: string;
 };
 
-const initialErrors: Omit<UserForm, 'id'> = {
-  username: '',
-  email: '',
+const initialErrors: any = {
+  firstName: '',
+  lastName: '',
+  role: '',
 };
 
 const initialValues: UserForm = {
   id: null,
-  username: '',
-  email: '',
+  firstName: '',
+  lastName: '',
+  role: '',
 };
 
 const UserSchema = object({
-  id: number().nullable(),
-  username: string().nonempty('Username is required'),
-  email: string().nonempty('Email is required'),
+  id: string().nullable().optional(),
+  firstName: string().nonempty('First Name is required'),
+  lastName: string().nonempty('Last Name is required'),
+  role: string().nonempty('Role is required'),
 });
 
 type UserSchemaInput = TypeOf<typeof UserSchema>;
 
-const columns = (onDelete: (id: number) => Promise<void>, onEdit: (id: number) => void): GridColDef<any>[] => [
+
+const columns = (onDelete: (id: string) => Promise<void>, onEdit: (id: string) => void): GridColDef<any>[] => [
   {
     field: 'id',
     headerName: 'Id',
@@ -44,23 +56,37 @@ const columns = (onDelete: (id: number) => Promise<void>, onEdit: (id: number) =
     headerAlign: 'left',
   },
   {
-    field: 'username',
-    headerName: 'Username',
+    field: 'firstName',
+    headerName: 'First Name',
     flex: 1,
     align: 'center',
     headerAlign: 'center',
   },
   {
-    field: 'email',
-    headerName: 'Email',
+    field: 'lastName',
+    headerName: 'Last Name',
     flex: 1,
+    align: 'center',
+    headerAlign: 'center',
+  },
+  {
+    field: 'username',
+    headerName: 'Email',
+    flex: 2,
+    align: 'center',
+    headerAlign: 'center',
+  },
+  {
+    field: 'role',
+    headerName: 'Role',
+    flex: 0.7,
     align: 'center',
     headerAlign: 'center',
   },
   {
     field: 'delete',
     headerName: '',
-    flex: 1,
+    flex: 0.5,
     align: 'center',
     headerAlign: 'center',
     renderCell: (params: any) => {
@@ -70,7 +96,7 @@ const columns = (onDelete: (id: number) => Promise<void>, onEdit: (id: number) =
   {
     field: 'edit',
     headerName: '',
-    flex: 1,
+    flex: 0.5,
     align: 'center',
     headerAlign: 'center',
     renderCell: (params: any) => {
@@ -80,8 +106,8 @@ const columns = (onDelete: (id: number) => Promise<void>, onEdit: (id: number) =
 ];
 
 const UsersList = () => {
-  const users = useRef<{
-    values: any[];
+  const [users, setUsers] = useState<{
+    values: UserRepresentation[];
     meta: {
       page: number;
       pages: number;
@@ -89,16 +115,12 @@ const UsersList = () => {
       count: number;
     };
   }>({
-    values: Array.from(Array(100).keys()).map((i) => ({
-      id: i + 1,
-      username: `User ${i + 1}`,
-      email: `email${i + 1}@test.com`,
-    })),
+    values: [],
     meta: {
       page: 0,
-      pages: 5,
-      total: 100,
-      count: 20,
+      pages: 0,
+      total: 0,
+      count: 0,
     },
   });
   const [showEdit, setShowEdit] = useState(false);
@@ -109,176 +131,170 @@ const UsersList = () => {
     resolver: zodResolver(UserSchema),
   });
 
-  useEffect(() => {
-    // (async () => {
-    //   const response = await fetch('http://localhost:5000/api/users');
-    //   setUsers(await response.json());
-    // })();
-  }, []);
 
-  const onDelete = async (id: number) => {
-    users.current = {
-      values: users.current?.values.filter((user) => user.id !== id) || [],
-      meta: {
-        page: 0,
-        pages: 5,
-        total: 100,
-        count: 20,
-      },
-    };
-    // const response = await fetch('http://localhost:5000/api/users', {
-    //   method: 'DELETE',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ id }),
-    // });
-    //   setUsers(await response.json());
-    showNotification('User successfully deleted', 'success');
+  async function fetchUserRole(userId: string, kcClient: KcAdminClient): Promise<string> {
+    const listRoleMappings = await kcClient.users.listRoleMappings({ id: userId });
+    const roles = listRoleMappings.realmMappings;
+
+    // Try to find a 'Driver' or 'Manager' role first
+    const prioritizedRoles = roles.filter(role => ['driver', 'admin'].includes(role.name));
+
+    if (prioritizedRoles.length > 0) {
+      // If a 'Driver' or 'Manager' role is found, return the name of the first one
+      return prioritizedRoles[0].name;
+    } else {
+      // If neither 'Driver' nor 'Manager' roles are found, return 'User'
+      return 'client';
+    }
+  }
+
+  const fetchUsers = async () => {
+    const kcClient = await getKcAdminClient();
+    try {
+      const users = await kcClient.users.find();
+
+      const userProfilePromises = users.map(user =>
+        fetchUserRole(user.id, kcClient).then(role => ({
+          id: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          username: user.username,
+          role: role,
+        }))
+      );
+
+      const usersWithRoles = await Promise.all(userProfilePromises);
+
+      setUsers({
+        values: usersWithRoles,
+        meta: {
+          page: 0,
+          pages: 0,
+          total: 0,
+          count: 0,
+        },
+      });
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      showNotification('Error fetching users', 'error');
+    }
   };
 
-  const onEditToggle = async (id: number) => {
+  useEffect(() => {
+    fetchUsers();
+  }, []); // Run only on mount
+
+  const onDelete = async (id: string) => {
+    try {
+      const kcClient = await getKcAdminClient();
+      await kcClient.users.del({id: id});
+      setUsers((prevUsers) => ({
+        values: prevUsers.values.filter((user) => user.id !== id),
+        meta: prevUsers.meta,
+      }));
+      showNotification('User successfully deleted', 'success');
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      showNotification('Unexpected error', 'error');
+    }
+  };
+
+  const onEditToggle = (id: string) => {
     setShowEdit(!showEdit);
-    setEditedUser(users.current?.values.find((user) => user.id === id));
+    setEditedUser(users.values.find((user) => user.id === id) || initialValues);
   };
 
   const onCreateToggle = () => {
     setShowCreate(!showCreate);
   };
 
-  const onEdit = useCallback(async (event: FormEvent<HTMLFormElement>) => {
-    try {
-      event.preventDefault();
-      setErrors(initialErrors);
-      const formData = new FormData(event.currentTarget);
+  const onEdit = useCallback(
+    async (event: FormEvent<HTMLFormElement>) => {
+      try {
+        event.preventDefault();
+        setErrors(initialErrors);
+        const formData = new FormData(event.currentTarget);
 
-      const data = {
-        id: editedUser.id as number,
-        username: formData.get('username') as string,
-        email: formData.get('email') as string,
-      };
+        const kcClient = await getKcAdminClient();
+        let userProfile = await kcClient.users.findOne({id: editedUser.id, userProfileMetadata: true});
+        const data = {
+          firstName: formData.get('firstName') as string,
+          lastName: formData.get('lastName') as string,
+          role: formData.get('role') as string,
+        }
+        const validatedData = UserSchema.parse(data);
 
-      const validatedData = UserSchema.parse(data);
+        userProfile.firstName = validatedData.firstName;
+        userProfile.lastName = validatedData.lastName;
 
-      // const response = await fetch('http://localhost:5000/api/users', {
-      //   method: 'PUT',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(validatedData),
-      // });
-      // setUsers(await response.json());
+        // update role:
+        const currentRole = users.values.filter(user => user.id === editedUser.id)[0].role;
+        const newRolePayload =
+        validatedData.role === "driver" ? {name: 'driver', id: '067b1624-08f2-4824-9086-a8e5c75ca41f'} :
+        validatedData.role === "admin" ? {name: 'admin', id: 'db2b1dfa-03be-4466-a158-96c54f5403b9'} :
+        null;
+        console.log(newRolePayload, currentRole)
+        let newRoleName = 'client';
+        if (newRolePayload === null) {
+          await kcClient.users.delRealmRoleMappings({id: editedUser.id, roles: [{name: 'driver', id: '067b1624-08f2-4824-9086-a8e5c75ca41f'}, {name: 'admin', id:'db2b1dfa-03be-4466-a158-96c54f5403b9' }]})
+        } else if (newRolePayload.name === "driver") {
+          if (currentRole === 'admin') {
+            await kcClient.users.delRealmRoleMappings({id: editedUser.id, roles: [{name: 'admin', id:'db2b1dfa-03be-4466-a158-96c54f5403b9' }]})
+          }
+          newRoleName = 'driver'
+          await kcClient.users.addRealmRoleMappings({id: editedUser.id, roles: [newRolePayload]})
+        } else if (newRolePayload.name === "admin") {
+          if (currentRole === 'driver') {
+            await kcClient.users.delRealmRoleMappings({id: editedUser.id, roles: [{name: 'driver', id: '067b1624-08f2-4824-9086-a8e5c75ca41f'}]})
+          }
+          await kcClient.users.addRealmRoleMappings({id: editedUser.id, roles: [newRolePayload]})
+          newRoleName = 'admin'
+        }
 
-      // if (!Object.keys(response).length) {
-      //   return showNotification('Unexpected error', 'error');
-      // }
-
-      users.current = {
-        values: users.current?.values.map((user) => (user.id === editedUser.id ? validatedData : user)) || [],
-        meta: {
-          page: 0,
-          pages: 5,
-          total: 100,
-          count: 20,
-        },
-      };
-      setShowEdit(false);
-      setEditedUser(initialValues);
-
-      showNotification('User successfully updated', 'success');
-    } catch (err) {
-      if (isZodError(err)) {
-        setErrors(
-          err.issues.reduce((acc, error) => {
-            return { ...acc, [error.path[0]]: error.message };
-          }, {} as UserForm),
-        );
-      } else if (isApiError(err)) {
-        const {
-          data: { code, message },
-        } = err;
-        showNotification(`${code.toUpperCase()}: ${message}`, 'error');
-      } else if (hasErrorMessage(err)) {
-        console.error(err);
-        showNotification(err.message, 'error');
-      } else {
-        console.error(err);
-        showNotification('Unexpected error', 'error');
+        await kcClient.users.update({id: editedUser.id}, userProfile);
+        setUsers({
+          values: users.values.map((user) =>
+            user.id === user.id ? {id: userProfile?.id, firstName: userProfile?.firstName, lastName: userProfile?.lastName, username: userProfile?.email, role: newRoleName} : user,
+          ) as UserRepresentation[],
+          meta: users.meta,
+        });
+        setShowEdit(false);
+        setEditedUser(initialValues);
+        showNotification('User successfully updated', 'success');
+      } catch (err) {
+        if (isZodError(err)) {
+          setErrors(
+            err.issues.reduce((acc, error) => {
+              return { ...acc, [error.path[0]]: error.message };
+            }, {} as UserForm),
+          );
+        } else if (isApiError(err)) {
+          const {
+            data: { code, message },
+          } = err;
+          showNotification(`${code.toUpperCase()}: ${message}`, 'error');
+        } else if (hasErrorMessage(err)) {
+          console.error(err);
+          showNotification(err.message, 'error');
+        } else {
+          console.error(err);
+          showNotification('Unexpected error', 'error');
+        }
       }
-    }
-  }, []);
-
-  const onCreate = useCallback(async (event: FormEvent<HTMLFormElement>) => {
-    try {
-      event.preventDefault();
-      setErrors(initialErrors);
-      const formData = new FormData(event.currentTarget);
-
-      const data = {
-        id: users.current?.values?.length + 1 || 0,
-        username: formData.get('username') as string,
-        email: formData.get('email') as string,
-      };
-
-      const validatedData = UserSchema.parse(data);
-
-      // const response = await fetch('http://localhost:5000/api/users', {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      //   body: JSON.stringify(validatedData),
-      // });
-      // setUsers(await response.json());
-
-      // if (!Object.keys(response).length) {
-      //   return showNotification('Unexpected error', 'error');
-      // }
-
-      users.current = {
-        values: [...(users.current?.values || []), validatedData],
-        meta: {
-          page: 0,
-          pages: 5,
-          total: 100,
-          count: 20,
-        },
-      };
-      setShowCreate(false);
-
-      showNotification('User successfully added', 'success');
-    } catch (err) {
-      if (isZodError(err)) {
-        setErrors(
-          err.issues.reduce((acc, error) => {
-            return { ...acc, [error.path[0]]: error.message };
-          }, {} as UserForm),
-        );
-      } else if (isApiError(err)) {
-        const {
-          data: { code, message },
-        } = err;
-        showNotification(`${code.toUpperCase()}: ${message}`, 'error');
-      } else if (hasErrorMessage(err)) {
-        console.error(err);
-        showNotification(err.message, 'error');
-      } else {
-        console.error(err);
-        showNotification('Unexpected error', 'error');
-      }
-    }
-  }, []);
+    },
+    [users, editedUser],
+  );
 
   return (
     <>
       <Typography variant="h4" sx={styles.tableHeading}>
         Users List
       </Typography>
-      <Button onClick={onCreateToggle}>Create new</Button>
+      {/* <Button onClick={onCreateToggle}>Create new</Button> */}
       {users && (
         <DataGrid
-          loading={!users.current.values.length}
-          rows={users.current.values}
+          loading={!users.values.length}
+          rows={users.values}
           columns={columns(onDelete, onEditToggle)}
           pageSizeOptions={[5, 10, 20]}
           showCellVerticalBorder={false}
@@ -293,80 +309,60 @@ const UsersList = () => {
         />
       )}
       <Modal open={showEdit} onClose={() => setShowEdit(false)}>
-        <FormProvider {...methods}>
-          <Box component="form" onSubmit={onEdit} sx={styles.modalBox} mt={4} noValidate>
-            <Typography variant="h6">Edit User</Typography>
-            <Grid container spacing={4}>
-              <Grid xs={12} md={6} item>
-                <TextField
-                  id="email"
-                  name="email"
-                  label="Email"
-                  type="email"
-                  autoComplete="email"
-                  defaultValue={editedUser?.email}
-                  helperText={errors.email}
-                  error={!!errors.email}
-                  fullWidth
-                  autoFocus
-                />
+        <div>
+          <FormProvider {...methods}>
+            <Box component="form" onSubmit={onEdit} sx={styles.modalBox} mt={4} noValidate>
+              <Typography variant="h6">Edit User</Typography>
+              <Grid container spacing={4}>
+                <Grid xs={12} md={6} item>
+                  <TextField
+                    id="firstName"
+                    name="firstName"
+                    label="First Name"
+                    type="text"
+                    autoComplete="off"
+                    defaultValue={editedUser?.firstName}
+                    helperText={errors.firstName}
+                    error={!!errors.firstName}
+                    fullWidth
+                    autoFocus
+                  />
+                </Grid>
+                <Grid xs={12} md={6} item>
+                  <TextField
+                    id="lastName"
+                    name="lastName"
+                    label="Last Name"
+                    type="text"
+                    autoComplete="off"
+                    defaultValue={editedUser?.lastName}
+                    helperText={errors.lastName}
+                    error={!!errors.lastName}
+                    fullWidth
+                  />
+                </Grid>
+                <Grid xs={12} md={6} item>
+                <Select
+                    id="role"
+                    name="role"
+                    label="Role"
+                    autoComplete="off"
+                    defaultValue={editedUser?.role}
+                    // error={!!errors.role}
+                    fullWidth
+                  >
+                    <MenuItem value={'client'}>Client</MenuItem>
+                    <MenuItem value={'driver'}>Driver</MenuItem>
+                    <MenuItem value={'admin'}>Admin</MenuItem>
+                  </Select>
+                </Grid>
               </Grid>
-            </Grid>
-            <Grid xs={12} md={6} item>
-              <TextField
-                id="username"
-                name="username"
-                label="Username"
-                type="text"
-                autoComplete="off"
-                defaultValue={editedUser?.username}
-                helperText={errors.username}
-                error={!!errors.username}
-                fullWidth
-              />
-            </Grid>
-            <LoadingButton type="submit" variant="contained" sx={styles.formButton}>
-              Update
-            </LoadingButton>
-          </Box>
-        </FormProvider>
-      </Modal>
-      <Modal open={showCreate} onClose={() => setShowCreate(false)}>
-        <FormProvider {...methods}>
-          <Box component="form" onSubmit={onCreate} sx={styles.modalBox} mt={4} noValidate>
-            <Typography variant="h6">Create User</Typography>
-            <Grid container spacing={4}>
-              <Grid xs={12} md={6} item>
-                <TextField
-                  id="email"
-                  name="email"
-                  label="Email"
-                  type="email"
-                  autoComplete="email"
-                  helperText={errors.email}
-                  error={!!errors.email}
-                  fullWidth
-                  autoFocus
-                />
-              </Grid>
-            </Grid>
-            <Grid xs={12} md={6} item>
-              <TextField
-                id="username"
-                name="username"
-                label="Username"
-                type="text"
-                autoComplete="off"
-                helperText={errors.username}
-                error={!!errors.username}
-                fullWidth
-              />
-            </Grid>
-            <LoadingButton type="submit" variant="contained" sx={styles.formButton}>
-              Create
-            </LoadingButton>
-          </Box>
-        </FormProvider>
+              <LoadingButton type="submit" variant="contained" sx={styles.formButton}>
+                Update
+              </LoadingButton>
+            </Box>
+          </FormProvider>
+        </div>
       </Modal>
     </>
   );

@@ -19,17 +19,13 @@ import { Provider } from 'react-redux';
 import { App } from './App';
 import { store } from './store';
 import { keycloak } from './consts';
-import { AuthClientError, AuthClientEvent } from '@react-keycloak/core/lib/types';
+import { AuthClientTokens } from '@react-keycloak/core/lib/types';
 import { ReactKeycloakProvider } from '@react-keycloak/web';
 
-const handleOnEvent = async (event: AuthClientEvent, _error?: AuthClientError) => {
-  if (_error) {
-    console.error(_error);
-    return;
-  }
-
-  if (event === 'onAuthSuccess') {
-    if (keycloak.authenticated) {
+const tokenHandler = async (tokens: AuthClientTokens) => {
+  if (!tokens.token) {
+    keycloak.login();
+  } else {
       const token = keycloak.token;
       const refreshToken = keycloak.refreshToken;
       const idToken = keycloak.idToken;
@@ -39,19 +35,15 @@ const handleOnEvent = async (event: AuthClientEvent, _error?: AuthClientError) =
       localStorage.setItem('refreshToken', refreshToken || '');
       localStorage.setItem('idToken', idToken || '');
     }
-  }
 };
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <Provider store={store}>
-    <ReactKeycloakProvider
-      authClient={keycloak}
-      // LoadingComponent={<Loader type="page" />}
-      onEvent={(event) => handleOnEvent(event)}
-    >
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
-    </ReactKeycloakProvider>
-  </Provider>,
+  <ReactKeycloakProvider authClient={keycloak} onTokens={tokenHandler}>
+    <Provider store={store}>
+
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>
+    </Provider>
+  </ReactKeycloakProvider>,
 );
