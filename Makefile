@@ -5,7 +5,7 @@ help: ## Display available targets and their documentation
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 dev: ## Run the application in the development environment
-	@bash run-dev.sh
+	@docker compose up --abort-on-container-exit
 
 build: ## Build the development environment
 	@docker compose build --parallel
