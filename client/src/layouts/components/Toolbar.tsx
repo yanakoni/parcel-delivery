@@ -9,6 +9,7 @@ import { keycloak, ROUTES, USER_ROLES } from '../../consts';
 import { styles } from './styles';
 import { fixtures } from '../../pages';
 import { isKeycloakUserInfo } from '../../guards';
+import { extractRoleFromRealmAccess } from '../../utils/keycloakRoles';
 
 interface ToolbarProps {
   handleDrawerToggle: () => void;
@@ -22,14 +23,10 @@ const Toolbar: FC<ToolbarProps> = ({ handleDrawerToggle }) => {
 
   useEffect(() => {
     (async () => {
-      await keycloak.loadUserInfo();
-
-      if (!isKeycloakUserInfo(keycloak.userInfo)) return;
-
       setUserData({
-        name: keycloak.userInfo.name,
-        email: keycloak.userInfo.email,
-        role: keycloak.realmAccess?.roles[0] || USER_ROLES.CLIENT,
+        name: keycloak?.tokenParsed?.name,
+        email: keycloak?.tokenParsed?.email,
+        role: extractRoleFromRealmAccess(keycloak?.tokenParsed?.realm_access?.roles),
       });
     })();
   }, []);

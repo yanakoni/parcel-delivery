@@ -4,6 +4,7 @@ import { ExpandLess, ExpandMore, SvgIconComponent } from '@mui/icons-material';
 import { SxProps } from '@mui/system';
 import { Collapse, List, ListItemButton, ListItemIcon, ListItemText, Theme } from '@mui/material';
 import { keycloak, USER_ROLES, UserRole } from '../../consts';
+import { extractRoleFromRealmAccess } from '../../utils/keycloakRoles';
 
 interface IMenuItem {
   id: number | string;
@@ -33,8 +34,7 @@ const MenuItem: FC<IMenuItem & { level?: number }> = ({
 }) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-
-  const userRole = (keycloak.authenticated && keycloak.realmAccess?.roles[0]) || USER_ROLES.CLIENT;
+  const userRole = extractRoleFromRealmAccess(keycloak?.tokenParsed?.realm_access?.roles);
 
   const anyNestedItemSelected = nested?.some((item) => item?.menuGroup && pathname.includes(item.menuGroup));
   const selected = useMemo(() => {

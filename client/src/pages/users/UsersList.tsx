@@ -1,4 +1,4 @@
-import { Box, Button, Grid, Modal, TextField, Typography } from '@mui/material';
+import { Box, Button, Grid, Modal, TextField, Typography, Select, MenuItem, FormControl } from '@mui/material';
 import { styles } from '../dashboard/styles';
 import { CustomNoRowsOverlay } from '../../components';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
@@ -11,40 +11,37 @@ import { hasErrorMessage, isApiError, isZodError } from '../../guards';
 import { LoadingButton } from '@mui/lab';
 import { getKcAdminClient } from '../../api/keycloakAdminClient';
 import UserRepresentation from '@keycloak/keycloak-admin-client/lib/defs/userRepresentation';
-import { USER_ROLES } from '../../consts';
+import { USER_ROLES, keycloak } from '../../consts';
 import KcAdminClient from '@keycloak/keycloak-admin-client';
 import MappingsRepresentation from '@keycloak/keycloak-admin-client/lib/defs/mappingsRepresentation';
 import RoleRepresentation from '@keycloak/keycloak-admin-client/lib/defs/roleRepresentation';
+import { current } from '@reduxjs/toolkit';
 
 type UserForm = {
   id: string | null;
-  name: string;
-  type: string;
-  manufacturer: string;
-  capacity: number;
+  firstName: string;
+  lastName: string;
+  role: string;
 };
 
 const initialErrors: any = {
-  name: '',
-  type: '',
-  manufacturer: '',
-  capacity: '',
+  firstName: '',
+  lastName: '',
+  role: '',
 };
 
 const initialValues: UserForm = {
   id: null,
-  name: '',
-  type: '',
-  manufacturer: '',
-  capacity: 0,
+  firstName: '',
+  lastName: '',
+  role: '',
 };
 
 const UserSchema = object({
   id: string().nullable().optional(),
-  name: string().nonempty('Name is required'),
-  type: string().nonempty('Type is required'),
-  manufacturer: string().nonempty('Manufacturer is required'),
-  capacity: number().min(0, 'Capacity must be greater than or equal to 0'),
+  firstName: string().nonempty('First Name is required'),
+  lastName: string().nonempty('Last Name is required'),
+  role: string().nonempty('Role is required'),
 });
 
 type UserSchemaInput = TypeOf<typeof UserSchema>;
@@ -140,14 +137,14 @@ const UsersList = () => {
     const roles = listRoleMappings.realmMappings;
 
     // Try to find a 'Driver' or 'Manager' role first
-    const prioritizedRoles = roles.filter(role => ['Driver', 'Manager'].includes(role.name));
+    const prioritizedRoles = roles.filter(role => ['driver', 'admin'].includes(role.name));
 
     if (prioritizedRoles.length > 0) {
       // If a 'Driver' or 'Manager' role is found, return the name of the first one
       return prioritizedRoles[0].name;
     } else {
       // If neither 'Driver' nor 'Manager' roles are found, return 'User'
-      return 'User';
+      return 'client';
     }
   }
 
@@ -218,37 +215,52 @@ const UsersList = () => {
         setErrors(initialErrors);
         const formData = new FormData(event.currentTarget);
 
+        const kcClient = await getKcAdminClient();
+        let userProfile = await kcClient.users.findOne({id: editedUser.id, userProfileMetadata: true});
         const data = {
-          id: editedUser.id as string,
-          name: formData.get('name') as string,
-          type: formData.get('type') as string,
-          manufacturer: formData.get('manufacturer') as string,
-          capacity: parseInt(formData.get('capacity') as string),
-        };
-
+          firstName: formData.get('firstName') as string,
+          lastName: formData.get('lastName') as string,
+          role: formData.get('role') as string,
+        }
         const validatedData = UserSchema.parse(data);
 
-        const response = await fetch(`http://localhost:3000/vehicles/${editedUser.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(validatedData),
-        });
+        userProfile.firstName = validatedData.firstName;
+        userProfile.lastName = validatedData.lastName;
 
-        if (response.ok) {
-          setUsers({
-            values: users.values.map((user) =>
-              user.id === editedUser.id ? validatedData : user,
-            ) as UserForm[],
-            meta: users.meta,
-          });
-          setShowEdit(false);
-          setEditedUser(initialValues);
-          showNotification('User successfully updated', 'success');
-        } else {
-          showNotification('Failed to update user', 'error');
+        // update role:
+        const currentRole = users.values.filter(user => user.id === editedUser.id)[0].role;
+        const newRolePayload =
+        validatedData.role === "driver" ? {name: 'driver', id: '067b1624-08f2-4824-9086-a8e5c75ca41f'} :
+        validatedData.role === "admin" ? {name: 'admin', id: 'db2b1dfa-03be-4466-a158-96c54f5403b9'} :
+        null;
+        console.log(newRolePayload, currentRole)
+        let newRoleName = 'client';
+        if (newRolePayload === null) {
+          await kcClient.users.delRealmRoleMappings({id: editedUser.id, roles: [{name: 'driver', id: '067b1624-08f2-4824-9086-a8e5c75ca41f'}, {name: 'admin', id:'db2b1dfa-03be-4466-a158-96c54f5403b9' }]})
+        } else if (newRolePayload.name === "driver") {
+          if (currentRole === 'admin') {
+            await kcClient.users.delRealmRoleMappings({id: editedUser.id, roles: [{name: 'admin', id:'db2b1dfa-03be-4466-a158-96c54f5403b9' }]})
+          }
+          newRoleName = 'driver'
+          await kcClient.users.addRealmRoleMappings({id: editedUser.id, roles: [newRolePayload]})
+        } else if (newRolePayload.name === "admin") {
+          if (currentRole === 'driver') {
+            await kcClient.users.delRealmRoleMappings({id: editedUser.id, roles: [{name: 'driver', id: '067b1624-08f2-4824-9086-a8e5c75ca41f'}]})
+          }
+          await kcClient.users.addRealmRoleMappings({id: editedUser.id, roles: [newRolePayload]})
+          newRoleName = 'admin'
         }
+
+        await kcClient.users.update({id: editedUser.id}, userProfile);
+        setUsers({
+          values: users.values.map((user) =>
+            user.id === user.id ? {id: userProfile?.id, firstName: userProfile?.firstName, lastName: userProfile?.lastName, username: userProfile?.email, role: newRoleName} : user,
+          ) as UserRepresentation[],
+          meta: users.meta,
+        });
+        setShowEdit(false);
+        setEditedUser(initialValues);
+        showNotification('User successfully updated', 'success');
       } catch (err) {
         if (isZodError(err)) {
           setErrors(
@@ -273,72 +285,12 @@ const UsersList = () => {
     [users, editedUser],
   );
 
-  const onCreate = useCallback(
-    async (event: FormEvent<HTMLFormElement>) => {
-      try {
-        event.preventDefault();
-        setErrors(initialErrors);
-        const formData = new FormData(event.currentTarget);
-
-        const data = {
-          name: formData.get('name') as string,
-          type: formData.get('type') as string,
-          manufacturer: formData.get('manufacturer') as string,
-          capacity: parseInt(formData.get('capacity') as string),
-        };
-
-        const validatedData = UserSchema.parse(data);
-
-        const response = await fetch('http://localhost:3000/vehicles', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(validatedData),
-        });
-
-        const dataResponse = await response.json();
-
-        if (response.ok) {
-          setUsers({
-            values: [...users.values, dataResponse.data],
-            meta: users.meta,
-          });
-          setShowCreate(false);
-          showNotification('User successfully added', 'success');
-        } else {
-          showNotification('Failed to add user', 'error');
-        }
-      } catch (err) {
-        if (isZodError(err)) {
-          setErrors(
-            err.issues.reduce((acc, error) => {
-              return { ...acc, [error.path[0]]: error.message };
-            }, {} as UserForm),
-          );
-        } else if (isApiError(err)) {
-          const {
-            data: { code, message },
-          } = err;
-          showNotification(`${code.toUpperCase()}: ${message}`, 'error');
-        } else if (hasErrorMessage(err)) {
-          console.error(err);
-          showNotification(err.message, 'error');
-        } else {
-          console.error(err);
-          showNotification('Unexpected error', 'error');
-        }
-      }
-    },
-    [users],
-  );
-
   return (
     <>
       <Typography variant="h4" sx={styles.tableHeading}>
         Users List
       </Typography>
-      <Button onClick={onCreateToggle}>Create new</Button>
+      {/* <Button onClick={onCreateToggle}>Create new</Button> */}
       {users && (
         <DataGrid
           loading={!users.values.length}
@@ -364,121 +316,49 @@ const UsersList = () => {
               <Grid container spacing={4}>
                 <Grid xs={12} md={6} item>
                   <TextField
-                    id="name"
-                    name="name"
-                    label="Name"
+                    id="firstName"
+                    name="firstName"
+                    label="First Name"
                     type="text"
                     autoComplete="off"
-                    defaultValue={editedUser?.name}
-                    helperText={errors.name}
-                    error={!!errors.name}
+                    defaultValue={editedUser?.firstName}
+                    helperText={errors.firstName}
+                    error={!!errors.firstName}
                     fullWidth
                     autoFocus
                   />
                 </Grid>
                 <Grid xs={12} md={6} item>
                   <TextField
-                    id="type"
-                    name="type"
-                    label="Type"
+                    id="lastName"
+                    name="lastName"
+                    label="Last Name"
                     type="text"
                     autoComplete="off"
-                    defaultValue={editedUser?.type}
-                    helperText={errors.type}
-                    error={!!errors.type}
+                    defaultValue={editedUser?.lastName}
+                    helperText={errors.lastName}
+                    error={!!errors.lastName}
                     fullWidth
                   />
                 </Grid>
                 <Grid xs={12} md={6} item>
-                  <TextField
-                    id="manufacturer"
-                    name="manufacturer"
-                    label="Manufacturer"
-                    type="text"
+                <Select
+                    id="role"
+                    name="role"
+                    label="Role"
                     autoComplete="off"
-                    defaultValue={editedUser?.manufacturer}
-                    helperText={errors.manufacturer}
-                    error={!!errors.manufacturer}
+                    defaultValue={editedUser?.role}
+                    // error={!!errors.role}
                     fullWidth
-                  />
-                </Grid>
-                <Grid xs={12} md={6} item>
-                  <TextField
-                    id="capacity"
-                    name="capacity"
-                    label="Capacity"
-                    type="number"
-                    defaultValue={editedUser?.capacity}
-                    helperText={errors.capacity}
-                    error={!!errors.capacity}
-                    fullWidth
-                  />
+                  >
+                    <MenuItem value={'client'}>Client</MenuItem>
+                    <MenuItem value={'driver'}>Driver</MenuItem>
+                    <MenuItem value={'admin'}>Admin</MenuItem>
+                  </Select>
                 </Grid>
               </Grid>
               <LoadingButton type="submit" variant="contained" sx={styles.formButton}>
                 Update
-              </LoadingButton>
-            </Box>
-          </FormProvider>
-        </div>
-      </Modal>
-      <Modal open={showCreate} onClose={() => setShowCreate(false)}>
-        <div>
-          <FormProvider {...methods}>
-            <Box component="form" onSubmit={onCreate} sx={styles.modalBox} mt={4} noValidate>
-              <Typography variant="h6">Create User</Typography>
-              <Grid container spacing={4}>
-                <Grid xs={12} md={6} item>
-                  <TextField
-                    id="name"
-                    name="name"
-                    label="Name"
-                    type="text"
-                    autoComplete="off"
-                    helperText={errors.name}
-                    error={!!errors.name}
-                    fullWidth
-                    autoFocus
-                  />
-                </Grid>
-                <Grid xs={12} md={6} item>
-                  <TextField
-                    id="type"
-                    name="type"
-                    label="Type"
-                    type="text"
-                    autoComplete="off"
-                    helperText={errors.type}
-                    error={!!errors.type}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid xs={12} md={6} item>
-                  <TextField
-                    id="manufacturer"
-                    name="manufacturer"
-                    label="Manufacturer"
-                    type="text"
-                    autoComplete="off"
-                    helperText={errors.manufacturer}
-                    error={!!errors.manufacturer}
-                    fullWidth
-                  />
-                </Grid>
-                <Grid xs={12} md={6} item>
-                  <TextField
-                    id="capacity"
-                    name="capacity"
-                    label="Capacity"
-                    type="number"
-                    helperText={errors.capacity}
-                    error={!!errors.capacity}
-                    fullWidth
-                  />
-                </Grid>
-              </Grid>
-              <LoadingButton type="submit" variant="contained" sx={styles.formButton}>
-                Create
               </LoadingButton>
             </Box>
           </FormProvider>
