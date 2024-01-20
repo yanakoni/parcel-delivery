@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ExpandLess, ExpandMore, SvgIconComponent } from '@mui/icons-material';
 import { SxProps } from '@mui/system';
 import { Collapse, List, ListItemButton, ListItemIcon, ListItemText, Theme } from '@mui/material';
-import { keycloak, USER_ROLES, UserRole } from '../../consts';
+import { keycloak, UserRole } from '../../consts';
 import { extractRoleFromRealmAccess } from '../../utils/keycloakRoles';
 
 interface IMenuItem {

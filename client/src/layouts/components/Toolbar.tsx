@@ -5,10 +5,9 @@ import { Menu, NotificationsNone, PersonOutline } from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
 import { grey } from '@mui/material/colors';
 import { NotificationsList } from './NotificationsList';
-import { keycloak, ROUTES, USER_ROLES } from '../../consts';
+import { keycloak, ROUTES } from '../../consts';
 import { styles } from './styles';
 import { fixtures } from '../../pages';
-import { isKeycloakUserInfo } from '../../guards';
 import { extractRoleFromRealmAccess } from '../../utils/keycloakRoles';
 
 interface ToolbarProps {
@@ -22,14 +21,14 @@ const Toolbar: FC<ToolbarProps> = ({ handleDrawerToggle }) => {
   const [userData, setUserData] = useState({ name: '', email: '', role: '' });
 
   useEffect(() => {
-    (async () => {
-      setUserData({
-        name: keycloak?.tokenParsed?.name,
-        email: keycloak?.tokenParsed?.email,
-        role: extractRoleFromRealmAccess(keycloak?.tokenParsed?.realm_access?.roles),
-      });
-    })();
-  }, []);
+    if (!keycloak.authenticated) return;
+
+    setUserData({
+      name: keycloak?.tokenParsed?.name,
+      email: keycloak?.tokenParsed?.email,
+      role: extractRoleFromRealmAccess(keycloak?.tokenParsed?.realm_access?.roles),
+    });
+  }, [keycloak.authenticated, keycloak.tokenParsed]);
 
   const openProfilePage = () => {
     navigate(ROUTES.PROFILE);

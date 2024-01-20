@@ -8,6 +8,7 @@ import { hasErrorMessage } from '../../../guards';
 import { showNotification } from '../../../utils';
 import { fixtures } from '../fixtures';
 import { styles } from '../styles';
+import { keycloak } from '../../../consts';
 
 const orderColumns = (isAdmin: boolean, onStatusChange: (_id: string) => void): GridColDef[] => {
   const cols = [
@@ -103,7 +104,7 @@ const OrderTable = ({ isAdmin }: OrderTableProps) => {
             filter: {
               name: 'sender',
               type: 'string',
-              value: 'test',
+              value: keycloak.tokenParsed?.id || 'test',
             },
           },
           signal: abortController.signal,
