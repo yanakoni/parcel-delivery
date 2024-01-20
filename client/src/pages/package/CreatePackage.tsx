@@ -12,6 +12,7 @@ import { hasErrorMessage, isApiError, isZodError } from '../../guards';
 import { ControlledAccordion } from '../../components';
 import { accordions, AccordionsProps } from './accordions';
 import { PaymentPage } from './PaymentPage';
+import { keycloak } from '../../consts';
 
 type PackageForm = {
   id: number | null;
@@ -201,8 +202,8 @@ const CreatePackage = ({ isAdmin }: { isAdmin: boolean }) => {
       const data = {
         sender: formData.get('sender') || 'test',
         senderObj: {
-          username: formData.get('senderObj.username'),
-          email: formData.get('senderObj.email'),
+          username: formData.get('senderObj.username') || keycloak?.tokenParsed?.name,
+          email: formData.get('senderObj.email') || keycloak?.tokenParsed?.email,
         },
         receiver: formData.get('receiver'),
         dimensions: {
