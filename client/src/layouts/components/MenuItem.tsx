@@ -34,7 +34,7 @@ const MenuItem: FC<IMenuItem & { level?: number }> = ({
 }) => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const userRole = extractRoleFromRealmAccess(keycloak?.tokenParsed?.realm_access?.roles);
+  const userRole = extractRoleFromRealmAccess(keycloak?.realmAccess?.roles);
 
   const anyNestedItemSelected = nested?.some((item) => item?.menuGroup && pathname.includes(item.menuGroup));
   const selected = useMemo(() => {

@@ -1,7 +1,7 @@
 import { Address } from './Address';
 
 interface PostOffice {
-  _id: string;
+  id: string;
   name: string;
   address: Address;
   contactNumber: string;

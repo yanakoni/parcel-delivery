@@ -55,7 +55,7 @@ const AddressAccordion = ({
         {!pickUpFromHome && (
           <PostOfficeSelector
             selectedPostOfficeId={pickUpPostOfficeId}
-            onPostOfficeSelect={(_id: string) => onPostOfficeSelect('departurePostOffice', _id)}
+            onPostOfficeSelect={(id: string) => onPostOfficeSelect('departurePostOffice', id)}
           />
         )}
         {pickUpFromHome && (
@@ -78,7 +78,7 @@ const AddressAccordion = ({
         {!deliveryToHome && (
           <PostOfficeSelector
             selectedPostOfficeId={deliveryPostOfficeId}
-            onPostOfficeSelect={(_id: string) => onPostOfficeSelect('departurePostOffice', _id)}
+            onPostOfficeSelect={(id: string) => onPostOfficeSelect('destinationPostOffice', id)}
           />
         )}
         {deliveryToHome && (

@@ -3,8 +3,6 @@ export * from './dashboard';
 export * from './package';
 export * from './payments';
 export * from './postOffices';
-export * from './roles';
-export * from './user';
 export * from './users';
 export * from './vehicles';
 export * from './ErrorPage';

@@ -1,21 +1,17 @@
-import { Box, Button, Grid, Modal, TextField, Typography, Select, MenuItem, FormControl } from '@mui/material';
+import { Box, Button, Grid, MenuItem, Modal, Select, TextField, Typography } from '@mui/material';
 import { styles } from '../dashboard/styles';
 import { CustomNoRowsOverlay } from '../../components';
 import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { number, object, string, TypeOf } from 'zod';
+import { object, string, TypeOf } from 'zod';
 import { showNotification } from '../../utils';
 import { hasErrorMessage, isApiError, isZodError } from '../../guards';
 import { LoadingButton } from '@mui/lab';
 import { getKcAdminClient } from '../../api/keycloakAdminClient';
 import UserRepresentation from '@keycloak/keycloak-admin-client/lib/defs/userRepresentation';
-import { USER_ROLES, keycloak } from '../../consts';
 import KcAdminClient from '@keycloak/keycloak-admin-client';
-import MappingsRepresentation from '@keycloak/keycloak-admin-client/lib/defs/mappingsRepresentation';
-import RoleRepresentation from '@keycloak/keycloak-admin-client/lib/defs/roleRepresentation';
-import { current } from '@reduxjs/toolkit';
 
 type UserForm = {
   id: string | null;
@@ -45,7 +41,6 @@ const UserSchema = object({
 });
 
 type UserSchemaInput = TypeOf<typeof UserSchema>;
-
 
 const columns = (onDelete: (id: string) => Promise<void>, onEdit: (id: string) => void): GridColDef<any>[] => [
   {
@@ -131,13 +126,12 @@ const UsersList = () => {
     resolver: zodResolver(UserSchema),
   });
 
-
   async function fetchUserRole(userId: string, kcClient: KcAdminClient): Promise<string> {
     const listRoleMappings = await kcClient.users.listRoleMappings({ id: userId });
     const roles = listRoleMappings.realmMappings;
 
     // Try to find a 'Driver' or 'Manager' role first
-    const prioritizedRoles = roles.filter(role => ['driver', 'admin'].includes(role.name));
+    const prioritizedRoles = roles.filter((role) => ['driver', 'admin'].includes(role.name));
 
     if (prioritizedRoles.length > 0) {
       // If a 'Driver' or 'Manager' role is found, return the name of the first one
@@ -153,14 +147,14 @@ const UsersList = () => {
     try {
       const users = await kcClient.users.find();
 
-      const userProfilePromises = users.map(user =>
-        fetchUserRole(user.id, kcClient).then(role => ({
+      const userProfilePromises = users.map((user) =>
+        fetchUserRole(user.id, kcClient).then((role) => ({
           id: user.id,
           firstName: user.firstName,
           lastName: user.lastName,
           username: user.username,
           role: role,
-        }))
+        })),
       );
 
       const usersWithRoles = await Promise.all(userProfilePromises);
@@ -187,7 +181,7 @@ const UsersList = () => {
   const onDelete = async (id: string) => {
     try {
       const kcClient = await getKcAdminClient();
-      await kcClient.users.del({id: id});
+      await kcClient.users.del({ id: id });
       setUsers((prevUsers) => ({
         values: prevUsers.values.filter((user) => user.id !== id),
         meta: prevUsers.meta,
@@ -216,45 +210,67 @@ const UsersList = () => {
         const formData = new FormData(event.currentTarget);
 
         const kcClient = await getKcAdminClient();
-        let userProfile = await kcClient.users.findOne({id: editedUser.id, userProfileMetadata: true});
+        let userProfile = await kcClient.users.findOne({ id: editedUser.id, userProfileMetadata: true });
         const data = {
           firstName: formData.get('firstName') as string,
           lastName: formData.get('lastName') as string,
           role: formData.get('role') as string,
-        }
+        };
         const validatedData = UserSchema.parse(data);
 
         userProfile.firstName = validatedData.firstName;
         userProfile.lastName = validatedData.lastName;
 
         // update role:
-        const currentRole = users.values.filter(user => user.id === editedUser.id)[0].role;
+        const currentRole = users.values.filter((user) => user.id === editedUser.id)[0].role;
         const newRolePayload =
-        validatedData.role === "driver" ? {name: 'driver', id: '067b1624-08f2-4824-9086-a8e5c75ca41f'} :
-        validatedData.role === "admin" ? {name: 'admin', id: 'db2b1dfa-03be-4466-a158-96c54f5403b9'} :
-        null;
-        console.log(newRolePayload, currentRole)
+          validatedData.role === 'driver'
+            ? { name: 'driver', id: '067b1624-08f2-4824-9086-a8e5c75ca41f' }
+            : validatedData.role === 'admin'
+            ? { name: 'admin', id: 'db2b1dfa-03be-4466-a158-96c54f5403b9' }
+            : null;
+        console.log(newRolePayload, currentRole);
         let newRoleName = 'client';
         if (newRolePayload === null) {
-          await kcClient.users.delRealmRoleMappings({id: editedUser.id, roles: [{name: 'driver', id: '067b1624-08f2-4824-9086-a8e5c75ca41f'}, {name: 'admin', id:'db2b1dfa-03be-4466-a158-96c54f5403b9' }]})
-        } else if (newRolePayload.name === "driver") {
+          await kcClient.users.delRealmRoleMappings({
+            id: editedUser.id,
+            roles: [
+              { name: 'driver', id: '067b1624-08f2-4824-9086-a8e5c75ca41f' },
+              { name: 'admin', id: 'db2b1dfa-03be-4466-a158-96c54f5403b9' },
+            ],
+          });
+        } else if (newRolePayload.name === 'driver') {
           if (currentRole === 'admin') {
-            await kcClient.users.delRealmRoleMappings({id: editedUser.id, roles: [{name: 'admin', id:'db2b1dfa-03be-4466-a158-96c54f5403b9' }]})
+            await kcClient.users.delRealmRoleMappings({
+              id: editedUser.id,
+              roles: [{ name: 'admin', id: 'db2b1dfa-03be-4466-a158-96c54f5403b9' }],
+            });
           }
-          newRoleName = 'driver'
-          await kcClient.users.addRealmRoleMappings({id: editedUser.id, roles: [newRolePayload]})
-        } else if (newRolePayload.name === "admin") {
+          newRoleName = 'driver';
+          await kcClient.users.addRealmRoleMappings({ id: editedUser.id, roles: [newRolePayload] });
+        } else if (newRolePayload.name === 'admin') {
           if (currentRole === 'driver') {
-            await kcClient.users.delRealmRoleMappings({id: editedUser.id, roles: [{name: 'driver', id: '067b1624-08f2-4824-9086-a8e5c75ca41f'}]})
+            await kcClient.users.delRealmRoleMappings({
+              id: editedUser.id,
+              roles: [{ name: 'driver', id: '067b1624-08f2-4824-9086-a8e5c75ca41f' }],
+            });
           }
-          await kcClient.users.addRealmRoleMappings({id: editedUser.id, roles: [newRolePayload]})
-          newRoleName = 'admin'
+          await kcClient.users.addRealmRoleMappings({ id: editedUser.id, roles: [newRolePayload] });
+          newRoleName = 'admin';
         }
 
-        await kcClient.users.update({id: editedUser.id}, userProfile);
+        await kcClient.users.update({ id: editedUser.id }, userProfile);
         setUsers({
           values: users.values.map((user) =>
-            user.id === user.id ? {id: userProfile?.id, firstName: userProfile?.firstName, lastName: userProfile?.lastName, username: userProfile?.email, role: newRoleName} : user,
+            user.id === user.id
+              ? {
+                  id: userProfile?.id,
+                  firstName: userProfile?.firstName,
+                  lastName: userProfile?.lastName,
+                  username: userProfile?.email,
+                  role: newRoleName,
+                }
+              : user,
           ) as UserRepresentation[],
           meta: users.meta,
         });
@@ -342,7 +358,7 @@ const UsersList = () => {
                   />
                 </Grid>
                 <Grid xs={12} md={6} item>
-                <Select
+                  <Select
                     id="role"
                     name="role"
                     label="Role"

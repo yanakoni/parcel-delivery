@@ -1,30 +1,13 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { RedirectAuthorized, RequireAuth } from './components';
 import { MainLayout } from './layouts';
-import { ROUTES } from './consts';
-import { EntityCreate, EntityEdit, EntityList, EntityRead } from './entity-crud';
-import {
-  ChangePasswordPage,
-  CreatePackage,
-  Dashboard,
-  ErrorPage,
-  PaymentsTable,
-  PostOfficeList,
-  ProfilePage,
-  ResetPasswordPage,
-  UsersList,
-  VehiclesList,
-} from './pages';
+import { keycloak, ROUTES } from './consts';
+import { CreatePackage, Dashboard, ErrorPage, PaymentsTable, PostOfficeList, UsersList, VehiclesList } from './pages';
+import { RequireAuth } from './components';
 
 export const router = createBrowserRouter([
   {
     path: ROUTES.MAIN,
     errorElement: <ErrorPage />,
-    element: (
-      // <Authenticate>
-      <RequireAuth />
-      // </Authenticate>
-    ),
     children: [
       {
         element: <MainLayout />,
@@ -42,14 +25,7 @@ export const router = createBrowserRouter([
             ],
           },
           {
-            children: [
-              {
-                path: ROUTES.PROFILE,
-                element: <ProfilePage />,
-              },
-            ],
-          },
-          {
+            element: <RequireAuth />,
             children: [
               {
                 path: ROUTES.USERS,
@@ -58,6 +34,7 @@ export const router = createBrowserRouter([
             ],
           },
           {
+            element: <RequireAuth />,
             children: [
               {
                 path: ROUTES.VEHICLES,
@@ -66,6 +43,7 @@ export const router = createBrowserRouter([
             ],
           },
           {
+            element: <RequireAuth />,
             children: [
               {
                 path: ROUTES.POST_OFFICES,
@@ -77,7 +55,7 @@ export const router = createBrowserRouter([
             children: [
               {
                 path: ROUTES.CREATE_PACKAGE,
-                element: <CreatePackage isAdmin />,
+                element: keycloak.authenticated ? <CreatePackage isAdmin /> : <CreatePackage isAdmin={false} />,
               },
             ],
           },
@@ -85,86 +63,9 @@ export const router = createBrowserRouter([
             children: [
               {
                 path: ROUTES.PAYMENTS,
-                element: <PaymentsTable isAdmin />,
+                element: keycloak.authenticated ? <PaymentsTable isAdmin /> : <PaymentsTable isAdmin={false} />,
               },
             ],
-          },
-          {
-            path: ROUTES.ENTITY_LIST,
-            element: <EntityList />,
-          },
-          {
-            path: ROUTES.ENTITY_EDIT,
-            element: <EntityEdit />,
-          },
-          {
-            path: ROUTES.ENTITY_CREATE,
-            element: <EntityCreate />,
-          },
-          {
-            path: ROUTES.ENTITY_READ,
-            element: <EntityRead />,
-          },
-          {
-            path: ROUTES.RESET_PASSWORD,
-            element: <ResetPasswordPage />,
-          },
-          {
-            path: ROUTES.CHANGE_PASSWORD,
-            element: <ChangePasswordPage />,
-          },
-        ],
-      },
-      {
-        path: ROUTES.RESET_PASSWORD,
-        element: <ResetPasswordPage />,
-      },
-      {
-        path: ROUTES.CHANGE_PASSWORD,
-        element: <ChangePasswordPage />,
-      },
-      {
-        children: [
-          {
-            path: ROUTES.CREATE_PACKAGE,
-            element: <CreatePackage isAdmin={false} />,
-          },
-        ],
-      },
-      {
-        children: [
-          {
-            path: ROUTES.PAYMENTS,
-            element: <PaymentsTable isAdmin={false} />,
-          },
-        ],
-      },
-    ],
-  },
-  {
-    element: <RedirectAuthorized />,
-    children: [
-      {
-        children: [
-          {
-            path: ROUTES.DASHBOARD,
-            element: <Dashboard />,
-          },
-        ],
-      },
-      {
-        children: [
-          {
-            path: ROUTES.PAYMENTS,
-            element: <PaymentsTable isAdmin={false} />,
-          },
-        ],
-      },
-      {
-        children: [
-          {
-            path: ROUTES.CREATE_PACKAGE,
-            element: <CreatePackage isAdmin={false} />,
           },
         ],
       },
