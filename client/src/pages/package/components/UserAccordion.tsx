@@ -23,7 +23,7 @@ const UserAccordion = ({ sender, receiver, onSenderChange }: UserAccordionProps)
   useEffect(() => {
     if (isSenderAuthenticated) {
       // TODO get sender id from keycloak
-      onSenderChange((keycloak?.userInfo as any)?.id);
+      onSenderChange(keycloak.tokenParsed?.id);
     }
   }, [isSenderAuthenticated, onSenderChange]);
 

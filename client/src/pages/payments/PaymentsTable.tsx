@@ -69,7 +69,7 @@ const PaymentsTable = ({ isAdmin }: PaymentsTableProps) => {
 
         if (isAdmin) {
           config.params = {
-            userId: (keycloak.userInfo as any)?.id || 'test',
+            userId: keycloak.tokenParsed?.id || 'test',
           };
         }
 

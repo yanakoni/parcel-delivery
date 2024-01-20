@@ -1,5 +1,5 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
-import { Authenticate, RequireAuth } from './components';
+import { RedirectAuthorized, RequireAuth } from './components';
 import { MainLayout } from './layouts';
 import { ROUTES } from './consts';
 import { EntityCreate, EntityEdit, EntityList, EntityRead } from './entity-crud';
@@ -21,9 +21,9 @@ export const router = createBrowserRouter([
     path: ROUTES.MAIN,
     errorElement: <ErrorPage />,
     element: (
-      <Authenticate>
-        <RequireAuth />
-      </Authenticate>
+      // <Authenticate>
+      <RequireAuth />
+      // </Authenticate>
     ),
     children: [
       {
@@ -136,6 +136,35 @@ export const router = createBrowserRouter([
           {
             path: ROUTES.PAYMENTS,
             element: <PaymentsTable isAdmin={false} />,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    element: <RedirectAuthorized />,
+    children: [
+      {
+        children: [
+          {
+            path: ROUTES.DASHBOARD,
+            element: <Dashboard />,
+          },
+        ],
+      },
+      {
+        children: [
+          {
+            path: ROUTES.PAYMENTS,
+            element: <PaymentsTable isAdmin={false} />,
+          },
+        ],
+      },
+      {
+        children: [
+          {
+            path: ROUTES.CREATE_PACKAGE,
+            element: <CreatePackage isAdmin={false} />,
           },
         ],
       },
