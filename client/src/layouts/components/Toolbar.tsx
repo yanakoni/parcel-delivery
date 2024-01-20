@@ -26,7 +26,7 @@ const Toolbar: FC<ToolbarProps> = ({ handleDrawerToggle }) => {
     setUserData({
       name: keycloak?.tokenParsed?.name,
       email: keycloak?.tokenParsed?.email,
-      role: extractRoleFromRealmAccess(keycloak?.tokenParsed?.realm_access?.roles),
+      role: extractRoleFromRealmAccess(keycloak?.realmAccess?.roles),
     });
   }, [keycloak.authenticated, keycloak.tokenParsed]);
 

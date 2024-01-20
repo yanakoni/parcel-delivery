@@ -3,9 +3,9 @@ import { Outlet } from 'react-router-dom';
 import { keycloak } from '../consts';
 
 export const RequireAuth: FC<any> = () => {
-  if (keycloak.authenticated && keycloak.tokenParsed) {
+  if (keycloak && keycloak.authenticated) {
     return <Outlet />;
-  } else {
-    (async () => keycloak.login())();
   }
+  keycloak?.login();
+  return null;
 };

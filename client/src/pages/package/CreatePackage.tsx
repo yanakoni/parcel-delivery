@@ -2,7 +2,7 @@ import { Box, Typography } from '@mui/material';
 import { styles } from '../dashboard/styles';
 import { LoadingButton } from '@mui/lab';
 import { FormProvider, useForm } from 'react-hook-form';
-import { FormEvent, useCallback, useState } from 'react';
+import { FormEvent, useCallback, useMemo, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { coerce, number, object, string, TypeOf } from 'zod';
 import { Address, Dimension } from '../../interfaces';
@@ -130,46 +130,56 @@ const CreatePackage = ({ isAdmin }: { isAdmin: boolean }) => {
     resolver: zodResolver(PackageSchema),
     defaultValues: initialValues,
   });
-  const accordionConfig: AccordionsProps = {
-    userAccordion: {
-      sender: {
+  const accordionConfig: AccordionsProps = useMemo(
+    () => ({
+      userAccordion: {
+        sender: {
+          errors,
+          register: methods.register,
+          field: 'senderObj',
+        },
+        receiver: {
+          errors,
+          register: methods.register,
+          field: 'receiver',
+        },
+        onSenderChange: (senderId: string) => methods.setValue('sender', senderId),
+      },
+      packageDimensions: {
         errors,
         register: methods.register,
-        field: 'senderObj',
       },
-      receiver: {
-        errors,
-        register: methods.register,
-        field: 'receiver',
+      address: {
+        pickUp: {
+          errors,
+          register: methods.register,
+          field: 'departureAddress',
+        },
+        delivery: {
+          errors,
+          register: methods.register,
+          field: 'destinationAddress',
+        },
+        pickUpPostOfficeId: methods.getValues().departurePostOffice || '',
+        deliveryPostOfficeId: methods.getValues().destinationPostOffice || '',
+        onPostOfficeSelect: (field: any, postOfficeId: string) => {
+          console.log(field, postOfficeId);
+          methods.setValue(field, postOfficeId);
+        },
       },
-      onSenderChange: (senderId: string) => methods.setValue('sender', senderId),
-    },
-    packageDimensions: {
-      errors,
-      register: methods.register,
-    },
-    address: {
-      pickUp: {
-        errors,
-        register: methods.register,
-        field: 'departureAddress',
-      },
-      delivery: {
-        errors,
-        register: methods.register,
-        field: 'destinationAddress',
-      },
-      pickUpPostOfficeId: methods.getValues().departurePostOffice || '',
-      deliveryPostOfficeId: methods.getValues().destinationPostOffice || '',
-      onPostOfficeSelect: (field: any, postOfficeId: string) => methods.setValue(field, postOfficeId),
-    },
-  };
+    }),
+    [errors, methods],
+  );
 
   const onCreate = useCallback(async (event: FormEvent<HTMLFormElement>) => {
     try {
       event.preventDefault();
       setErrors(initialErrors);
       const formData = new FormData(event.currentTarget);
+
+      Array.from(formData.entries()).map((entry, index) => {
+        console.log(`${index}: ${entry}`);
+      });
 
       const destinationAddress = {
         country: formData.get('destinationAddress.country'),
@@ -201,11 +211,13 @@ const CreatePackage = ({ isAdmin }: { isAdmin: boolean }) => {
           length: formData.get('length'),
         },
         weight: formData.get('weight'),
-        departurePostOffice: formData.get('departurePostOffice') || 'test',
-        destinationPostOffice: formData.get('destinationPostOffice') || 'test',
+        departurePostOffice: methods.getValues().departurePostOffice || 'test',
+        destinationPostOffice: methods.getValues().destinationPostOffice || 'test',
         departureAddress: departureAddress.country ? departureAddress : null,
         destinationAddress: destinationAddress.country ? destinationAddress : null,
       };
+
+      console.log(data);
 
       const validatedData = PackageSchema.parse(data);
 
