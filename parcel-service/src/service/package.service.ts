@@ -39,9 +39,9 @@ export class PackageService
 
     async update(
         id: string,
-        updateDto: UpdatePackageDto,
+        status: string,
     ): Promise<Package | null> {
-        return this.packageRepository.update(id, updateDto);
+        return this.packageRepository.update(id, status);
     }
 
     async remove(id: string): Promise<Package | null> {

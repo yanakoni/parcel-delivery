@@ -53,7 +53,7 @@ export const menuConfig: IMenuItem[] = [
     to: `${ENTITIES.PAYMENTS}`,
     roles: [USER_ROLES.ADMIN, USER_ROLES.CLIENT],
   },
-  {
+{
     id: 'orders',
     label: 'Orders',
     icon: LocalPostOffice,

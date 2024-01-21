@@ -23,9 +23,9 @@ export class PackageRepository implements RepositoryInterface<Package> {
         return createdPackage.save();
     }
 
-    async update(id: string, updateDto: any): Promise<Package | null> {
+    async update(id: string, status: string): Promise<Package | null> {
         return this.packageModel
-            .findByIdAndUpdate(id, updateDto, { new: true })
+            .findByIdAndUpdate(id, {status: status}, { new: true })
             .exec();
     }
 

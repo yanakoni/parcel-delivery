@@ -11,13 +11,7 @@ export class PostOffice extends Document {
     address: Address;
 
     @Prop({ required: true })
-    contactNumber: string;
-
-    @Prop({ required: true })
     workingHours: string;
-
-    @Prop({ required: true })
-    servicesOffered: string;
 }
 
 export type PostOfficeDocument = PostOffice & Document;

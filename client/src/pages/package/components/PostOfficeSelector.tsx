@@ -28,8 +28,8 @@ const PostOfficeSelector = ({ selectedPostOfficeId, onPostOfficeSelect }: PostOf
 
   const toggle = () => setIsOpen(!isOpen);
 
-  const formatPostOffice = ({ name, address: { street } }: PostOffice) => {
-    return `${name}, ${street}`;
+  const formatPostOffice = ({ name, address: { country, state, city, street, tel } }: PostOffice) => {
+    return `${name}, ${country}, ${state}, ${city}, ${street}, ${tel}`;
   };
 
   const formatSelectedPostOffice = () => {

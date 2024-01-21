@@ -9,13 +9,16 @@ class Address {
     country: string;
 
     @Prop({ required: true })
+    state: string;
+
+    @Prop({ required: true })
     city: string;
 
     @Prop({ required: false })
     street: string;
 
     @Prop({ required: false })
-    zipCode: string;
+    tel: string;
 
     @Prop({ required: false })
     note?: string;
