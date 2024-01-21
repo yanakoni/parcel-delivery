@@ -12,6 +12,11 @@ export class AddressDto {
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
+    state: string;
+
+    @IsString()
+    @IsNotEmpty()
+    @ApiProperty()
     city: string;
 
     @IsString()
@@ -22,7 +27,7 @@ export class AddressDto {
     @IsString()
     @IsNotEmpty()
     @ApiProperty()
-    zipCode: string;
+    tel: string;
 }
 
 export class CreatePostOfficeDto {
@@ -31,23 +36,12 @@ export class CreatePostOfficeDto {
     @ApiProperty()
     name: string;
 
-    // @IsObj()
     @IsNotEmpty()
     @ApiProperty({ type: AddressDto })
     address: AddressDto;
 
     @IsString()
     @IsNotEmpty()
-    @ApiProperty()
-    contactNumber: string;
-
-    @IsString()
-    @IsNotEmpty()
     @ApiProperty({ type: String })
     workingHours: string;
-
-    @IsString()
-    @IsNotEmpty()
-    @ApiProperty({ type: String })
-    servicesOffered: string;
 }

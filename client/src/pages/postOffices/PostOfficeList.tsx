@@ -15,26 +15,24 @@ type PostOfficeForm = {
   id: string | null;
   name: string;
   workingHours: string;
-  contactNumber: string;
-  servicesOffered: string;
   address: {
     country: string,
+    state: string,
     city: string,
     street: string,
-    zipCode: string,
+    tel: string,
   };
 };
 
 const initialErrors: any = {
   name: '',
   workingHours: '',
-  contactNumber: '',
-  servicesOffered: '',
   address: {
     country: '',
+    state: '',
     city: '',
     street: '',
-    zipCode: '',
+    tel: '',
   },
 };
 
@@ -42,13 +40,12 @@ const initialValues: PostOfficeForm = {
   id: null,
   name: '',
   workingHours: '',
-  contactNumber: '',
-  servicesOffered: '',
   address: {
     country: '',
+    state: '',
     city: '',
     street: '',
-    zipCode: '',
+    tel: '',
   }
 };
 
@@ -56,13 +53,12 @@ const PostOfficeSchema = object({
   id: string().nullable().optional(),
   name: string().nonempty('Name is required'),
   workingHours: string().nonempty('Working Hours is required'),
-  contactNumber: string().nonempty('Contact Number is required'),
-  servicesOffered: string().nonempty('Services Offered is required'),
   address: object({
     country: string().nonempty('Country is required'),
+    state: string().nonempty('State is required'),
     city: string().nonempty('City is required'),
     street: string().nonempty('Street is required'),
-    zipCode: string().nonempty('ZipCode is required'),
+    tel: string().nonempty('Tel is required'),
   })
 });
 
@@ -91,30 +87,16 @@ const columns = (onDelete: (id: string) => Promise<void>, onEdit: (id: string) =
     headerAlign: 'center',
   },
   {
-    field: 'contactNumber',
-    headerName: 'Contact Number',
-    flex: 1,
-    align: 'center',
-    headerAlign: 'center',
-  },
-  {
-    field: 'servicesOffered',
-    headerName: 'Services Offered',
-    flex: 1,
-    align: 'center',
-    headerAlign: 'center',
-  },
-  {
     field: 'address',
     headerName: 'Address',
-    flex: 2,
+    flex: 3,
     align: 'center',
     headerAlign: 'center',
     renderCell: (params: any) => {
       return <Grid container spacing={2}>
       <Grid item xs={12}>
         <Typography>
-          {`${params.row.address.street}, ${params.row.address.city}, ${params.row.address.country}, ${params.row.address.zipCode}`}
+          {`${params.row.address.street}, ${params.row.address.state}, ${params.row.address.city}, ${params.row.address.country}, ${params.row.address.tel}`}
         </Typography>
       </Grid>
     </Grid>;
@@ -230,13 +212,12 @@ const PostOfficeList = () => {
           id: editedPostOffice.id as string,
           name: formData.get('name') as string,
           workingHours: formData.get('workingHours') as string,
-          contactNumber: formData.get('contactNumber') as string,
-          servicesOffered: formData.get('servicesOffered') as string,
           address: {
             country: formData.get('address.country') as string,
+            state: formData.get('address.state') as string,
             city: formData.get('address.city') as string,
             street: formData.get('address.street') as string,
-            zipCode: formData.get('address.zipCode') as string,
+            tel: formData.get('address.tel') as string,
           }
         };
 
@@ -297,13 +278,12 @@ const PostOfficeList = () => {
         const data = {
           name: formData.get('name') as string,
           workingHours: formData.get('workingHours') as string,
-          contactNumber: formData.get('contactNumber') as string,
-          servicesOffered: formData.get('servicesOffered') as string,
           address: {
             country: formData.get('address.country') as string,
+            state: formData.get('address.state') as string,
             city: formData.get('address.city') as string,
             street: formData.get('address.street') as string,
-            zipCode: formData.get('address.zipCode') as string,
+            tel: formData.get('address.tel') as string,
           }
         };
 
@@ -398,20 +378,6 @@ const PostOfficeList = () => {
                 </Grid>
                 <Grid xs={12} md={6} item>
                   <TextField
-                    id="contactNumber"
-                    name="contactNumber"
-                    label="Contact Number"
-                    type="text"
-                    autoComplete="off"
-                    defaultValue={editedPostOffice?.contactNumber}
-                    helperText={errors.contactNumber}
-                    error={!!errors.contactNumber}
-                    fullWidth
-                    autoFocus
-                  />
-                </Grid>
-                <Grid xs={12} md={6} item>
-                  <TextField
                     id="workingHours"
                     name="workingHours"
                     label="Working Hours"
@@ -420,20 +386,6 @@ const PostOfficeList = () => {
                     defaultValue={editedPostOffice?.workingHours}
                     helperText={errors.workingHours}
                     error={!!errors.workingHours}
-                    fullWidth
-                    autoFocus
-                  />
-                </Grid>
-                <Grid xs={12} md={6} item>
-                  <TextField
-                    id="servicesOffered"
-                    name="servicesOffered"
-                    label="Services Offered"
-                    type="text"
-                    autoComplete="off"
-                    defaultValue={editedPostOffice?.servicesOffered}
-                    helperText={errors.servicesOffered}
-                    error={!!errors.servicesOffered}
                     fullWidth
                     autoFocus
                   />
@@ -458,6 +410,19 @@ const PostOfficeList = () => {
                       defaultValue={editedPostOffice?.address.country}
                       helperText={errors.address.country}
                       error={!!errors.address.country}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      id="state"
+                      name="address.state"
+                      label="State"
+                      type="text"
+                      autoComplete="off"
+                      defaultValue={editedPostOffice?.address.state}
+                      helperText={errors.address.state}
+                      error={!!errors.address.state}
                       fullWidth
                     />
                   </Grid>
@@ -489,14 +454,14 @@ const PostOfficeList = () => {
                   </Grid>
                   <Grid item>
                     <TextField
-                      id="zipCode"
-                      name="address.zipCode"
-                      label="Zip Code"
+                      id="tel"
+                      name="address.tel"
+                      label="Tel"
                       type="text"
                       autoComplete="off"
-                      defaultValue={editedPostOffice?.address.zipCode}
-                      helperText={errors.address.zipCode}
-                      error={!!errors.address.zipCode}
+                      defaultValue={editedPostOffice?.address.tel}
+                      helperText={errors.address.tel}
+                      error={!!errors.address.tel}
                       fullWidth
                     />
                   </Grid>
@@ -532,19 +497,6 @@ const PostOfficeList = () => {
                 </Grid>
                 <Grid xs={12} md={6} item>
                   <TextField
-                    id="contactNumber"
-                    name="contactNumber"
-                    label="Contact Number"
-                    type="text"
-                    autoComplete="off"
-                    helperText={errors.contactNumber}
-                    error={!!errors.contactNumber}
-                    fullWidth
-                    autoFocus
-                  />
-                </Grid>
-                <Grid xs={12} md={6} item>
-                  <TextField
                     id="workingHours"
                     name="workingHours"
                     label="Working Hours"
@@ -552,19 +504,6 @@ const PostOfficeList = () => {
                     autoComplete="off"
                     helperText={errors.workingHours}
                     error={!!errors.workingHours}
-                    fullWidth
-                    autoFocus
-                  />
-                </Grid>
-                <Grid xs={12} md={6} item>
-                  <TextField
-                    id="servicesOffered"
-                    name="servicesOffered"
-                    label="Services Offered"
-                    type="text"
-                    autoComplete="off"
-                    helperText={errors.servicesOffered}
-                    error={!!errors.servicesOffered}
                     fullWidth
                     autoFocus
                   />
@@ -588,6 +527,18 @@ const PostOfficeList = () => {
                       autoComplete="off"
                       helperText={errors.address.country}
                       error={!!errors.address.country}
+                      fullWidth
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      id="state"
+                      name="address.state"
+                      label="State"
+                      type="text"
+                      autoComplete="off"
+                      helperText={errors.address.state}
+                      error={!!errors.address.state}
                       fullWidth
                     />
                   </Grid>
@@ -617,13 +568,13 @@ const PostOfficeList = () => {
                   </Grid>
                   <Grid item>
                     <TextField
-                      id="zipCode"
-                      name="address.zipCode"
-                      label="Zip Code"
+                      id="tel"
+                      name="address.tel"
+                      label="Tel"
                       type="text"
                       autoComplete="off"
-                      helperText={errors.address.zipCode}
-                      error={!!errors.address.zipCode}
+                      helperText={errors.address.tel}
+                      error={!!errors.address.tel}
                       fullWidth
                     />
                   </Grid>

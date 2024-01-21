@@ -17,6 +17,8 @@ import { PackageService } from '../service';
 import { Package } from '../repository';
 import { Sort } from '../types';
 import { ParcelStatus } from '../enums';
+import { ApiQuery } from '@nestjs/swagger';
+
 
 @ApiTags('Packages')
 @Controller('package')
@@ -38,24 +40,24 @@ export class PackageController {
         return { data: parcel };
     }
 
-    @Put(':id')
-    @Roles({ roles: ['user', 'admin'] })
-    @Scopes('Update')
-    async update(
-        @Param('id') id: string,
-        @Body(new ValidationPipe()) updateDto: UpdatePackageDto,
-    ) {
-        const updatedPackage = await this.parcelService.update(id, updateDto);
-        return { data: updatedPackage };
-    }
+    // @Put(':id')
+    // @Roles({ roles: ['user', 'admin'] })
+    // @Scopes('Update')
+    // async update(
+    //     @Param('id') id: string,
+    //     @Body(new ValidationPipe()) updateDto: UpdatePackageDto,
+    // ) {
+    //     const updatedPackage = await this.parcelService.update(id, updateDto);
+    //     return { data: updatedPackage };
+    // }
 
     @Put('/status')
     @Roles({ roles: ['admin'] })
     @Scopes('Update')
-    async updateStatus(@Query('_id') _id: string) {
-        const updatedPackage = await this.parcelService.update(_id, {
-            status: ParcelStatus.PENDING,
-        });
+    @ApiQuery({ name: '_id', type: String, required: true })
+    @ApiQuery({ name: 'status', enum: Object.values(ParcelStatus), type: String })
+    async updateStatus(@Query('_id') _id: string, @Query('status') status?: ParcelStatus) {
+        const updatedPackage = await this.parcelService.update(_id, status);
         return { data: updatedPackage };
     }
 

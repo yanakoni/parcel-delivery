@@ -8,6 +8,6 @@ export interface PackageServiceInterface<T, CT, UT> {
         pipeline: PipelineStage[],
     ): Promise<{ items: T[]; itemsCount: number }>;
     create(createDto: CT): Promise<T>;
-    update(id: string, updateDto: UT): Promise<T | null>;
+    update(id: string, status: string): Promise<T | null>;
     remove(id: string): Promise<T | null>;
 }

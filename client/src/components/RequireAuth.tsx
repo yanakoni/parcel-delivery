@@ -4,7 +4,6 @@ import { useKeycloak } from '@react-keycloak/web';
 
 export const RequireAuth: FC<any> = () => {
   const { keycloak } = useKeycloak();
-
   if (keycloak && keycloak.authenticated) {
     return <Outlet />;
   }

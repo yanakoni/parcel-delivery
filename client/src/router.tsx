@@ -3,6 +3,7 @@ import { MainLayout } from './layouts';
 import { keycloak, ROUTES } from './consts';
 import { CreatePackage, Dashboard, ErrorPage, PaymentsTable, PostOfficeList, UsersList, VehiclesList } from './pages';
 import { RequireAuth } from './components';
+import { OrderTable } from './pages/dashboard/components';
 
 export const router = createBrowserRouter([
   {
@@ -64,6 +65,14 @@ export const router = createBrowserRouter([
               {
                 path: ROUTES.PAYMENTS,
                 element: keycloak.authenticated ? <PaymentsTable isAdmin /> : <PaymentsTable isAdmin={false} />,
+              },
+            ],
+          },
+          {
+            children: [
+              {
+                path: ROUTES.ORDERS,
+                element: keycloak.authenticated ? <OrderTable isAdmin /> : <OrderTable isAdmin={false} />,
               },
             ],
           },

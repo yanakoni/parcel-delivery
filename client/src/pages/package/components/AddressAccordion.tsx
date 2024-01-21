@@ -49,7 +49,7 @@ const AddressAccordion = ({
                 inputProps={{ 'aria-label': 'controlled' }}
               />
             }
-            label="Do you want courie to pick up from your home?"
+            label="Do you want courier to pick up from your home?"
           />
         </FormGroup>
         {!pickUpFromHome && (
