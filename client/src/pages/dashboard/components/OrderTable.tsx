@@ -8,7 +8,7 @@ import { hasErrorMessage } from '../../../guards';
 import { showNotification } from '../../../utils';
 import { fixtures } from '../fixtures';
 import { styles } from '../styles';
-import { keycloak } from '../../../consts';
+import { useKeycloak } from '@react-keycloak/web';
 
 const orderColumns = (isAdmin: boolean, onStatusChange: (_id: string) => void): GridColDef[] => {
   const cols = [
@@ -86,6 +86,7 @@ interface OrderTableProps {
 }
 
 const OrderTable = ({ isAdmin }: OrderTableProps) => {
+  const { keycloak } = useKeycloak();
   const { t } = useTranslation();
   // todo
   const [orders, setOrders] = useState<any[]>(fixtures.orders);

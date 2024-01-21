@@ -4,9 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { Logout } from '@mui/icons-material';
 import { IMenuItem, MenuItem } from './MenuItem';
 import { styles } from './styles';
-import { keycloak } from '../../consts';
+import { useKeycloak } from '@react-keycloak/web';
 
 export const SideMenu = ({ menuConfig }: { menuConfig: IMenuItem[] }) => {
+  const { keycloak } = useKeycloak();
   const { t } = useTranslation();
 
   const logOut = useCallback(async () => {
