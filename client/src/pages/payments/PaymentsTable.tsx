@@ -7,7 +7,7 @@ import { CustomNoRowsOverlay } from '../../components';
 import { hasErrorMessage } from '../../guards';
 import { showNotification } from '../../utils';
 import { styles } from '../dashboard/styles';
-import { keycloak } from '../../consts';
+import { useKeycloak } from '@react-keycloak/web';
 
 const paymentsColumns: GridColDef[] = [
   {
@@ -52,6 +52,7 @@ interface PaymentsTableProps {
 }
 
 const PaymentsTable = ({ isAdmin }: PaymentsTableProps) => {
+  const { keycloak } = useKeycloak();
   const { t } = useTranslation();
   // todo
   const [payments, setPayments] = useState<any[]>([]);

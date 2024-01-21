@@ -8,7 +8,8 @@ import { hasErrorMessage } from '../../../guards';
 import { showNotification } from '../../../utils';
 import { fixtures } from '../fixtures';
 import { styles } from '../styles';
-import { USER_ROLES, keycloak } from '../../../consts';
+import { useKeycloak } from '@react-keycloak/web';
+import { USER_ROLES } from '../../../consts';
 import { extractRoleFromRealmAccess } from '../../../utils/keycloakRoles';
 
 const orderColumns = (isAdmin: boolean): GridColDef[] => {
@@ -158,6 +159,7 @@ const handleChangeWrapper = (customParam: string) => async (event: SelectChangeE
 };
 
 const OrderTable = ({ isAdmin }: OrderTableProps) => {
+  const { keycloak } = useKeycloak();
   const { t } = useTranslation();
   const [orders, setOrders] = useState<any[]>(fixtures.orders);
   const [orderPaginationModel, setOrderPaginationModel] = useState({

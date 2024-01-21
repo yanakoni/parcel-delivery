@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { Grid, TextField, Typography } from '@mui/material';
 import { CreateUserForm } from './CreateUserForm';
-import { keycloak } from '../../../consts';
+import { useKeycloak } from '@react-keycloak/web';
 
 interface UserAccordionProps {
   sender: {
@@ -18,6 +18,7 @@ interface UserAccordionProps {
 }
 
 const UserAccordion = ({ sender, receiver, onSenderChange }: UserAccordionProps) => {
+  const { keycloak } = useKeycloak();
   const isSenderAuthenticated = keycloak.authenticated;
 
   useEffect(() => {
